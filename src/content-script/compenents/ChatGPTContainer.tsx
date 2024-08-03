@@ -33,7 +33,6 @@ function ChatGPTContainer(props: Props) {
   const [queryStatus, setQueryStatus] = useState<QueryStatus>()
   const [copied, setCopied] = useState(false)
   const [transcriptShow, setTranscriptShow] = useState(false)
-  const [selectedOption, setSelectedOption] = useState(0)
   const [loading, setLoading] = useState(false)
   const [theme, setTheme] = useState(Theme.Auto)
   const [questionProps, setQuestionProps] = useState<Props>({ ...props })
@@ -53,8 +52,6 @@ function ChatGPTContainer(props: Props) {
     if (val < 0 || !videoId) {
       return
     }
-
-    setSelectedOption(val)
 
     const transcriptList = await getConverTranscript({
       langOptionsWithLink: questionProps.langOptionsWithLink,
