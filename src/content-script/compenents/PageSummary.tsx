@@ -1,18 +1,17 @@
 import { getUserConfig } from '@/config'
 import ChatGPTQuery from '@/content-script/compenents/ChatGPTQuery'
 import { getSummaryPrompt } from '@/content-script/prompt'
-import { getPageSummaryComments, getPageSummaryContntent } from '@/content-script/utils'
-import { commentSummaryPrompt, pageSummaryPrompt, pageSummaryPromptHighlight } from '@/utils/prompt'
+import { getPageSummaryContntent } from '@/content-script/utils'
+import { pageSummaryPrompt, pageSummaryPromptHighlight } from '@/utils/prompt'
 import { useEffect, useState } from 'preact/hooks'
 
 interface Props {
   pageSummaryWhitelist: string
   pageSummaryBlacklist: string
-  siteRegex: RegExp
 }
 
 function PageSummary(props: Props) {
-  const { pageSummaryWhitelist, pageSummaryBlacklist, siteRegex } = props
+  const { pageSummaryWhitelist, pageSummaryBlacklist } = props
   const [question, setQuestion] = useState('')
 
   useEffect(() => {
@@ -24,44 +23,33 @@ function PageSummary(props: Props) {
       ? !blacklist.includes(hostname)
       : !blacklist.includes(hostname) && pageSummaryWhitelist.includes(hostname)
 
-    const show = inWhitelist && !siteRegex?.test(hostname)
-
     async function buildQuestion() {
-      const pageComments = await getPageSummaryComments()
       const pageContent = await getPageSummaryContntent()
-      const article = pageComments ? pageComments : pageContent
 
-      const title = article?.title || document.title || ''
+      const title = pageContent?.title || document.title || ''
       const description =
-        article?.description ||
+        pageContent?.description ||
         document.querySelector('meta[name="description"]')?.getAttribute('content') ||
         ''
-      const content = article?.content ? description + article?.content : title + description
+      const content = pageContent?.content
+        ? description + pageContent?.content
+        : title + description
 
-      if (!show) {
+      if (!inWhitelist) {
         console.log('Not showing summary because of blacklist or whitelist')
       }
 
-      if (show && (article?.content || description)) {
+      if (inWhitelist && (pageContent?.content || description)) {
         const language = window.navigator.language
         const userConfig = await getUserConfig()
 
         const promptContent = getSummaryPrompt(content.replace(/(<[^>]+>|\{[^}]+\})/g, ''))
 
-        return pageComments?.content
-          ? commentSummaryPrompt({
-              content: promptContent,
-              language: language,
-              prompt: userConfig.promptComment
-                ? userConfig.promptComment
-                : pageSummaryPromptHighlight,
-              rate: article?.['rate'],
-            })
-          : pageSummaryPrompt({
-              content: promptContent,
-              language: language,
-              prompt: userConfig.promptPage ? userConfig.promptPage : pageSummaryPromptHighlight,
-            })
+        return pageSummaryPrompt({
+          content: promptContent,
+          language: language,
+          prompt: userConfig.promptPage ? userConfig.promptPage : pageSummaryPromptHighlight,
+        })
       } else {
         console.log('Summary not supported because no content or description')
         return ''
@@ -71,7 +59,7 @@ function PageSummary(props: Props) {
     buildQuestion().then((prompt) => {
       setQuestion(prompt)
     })
-  }, [pageSummaryBlacklist, pageSummaryWhitelist, siteRegex])
+  }, [pageSummaryBlacklist, pageSummaryWhitelist])
 
   if (question) return <ChatGPTQuery question={question} />
 }

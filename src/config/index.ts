@@ -36,8 +36,6 @@ export async function getUserConfig(): Promise<UserConfig> {
   return defaults(result, userConfigWithDefaultValue)
 }
 
-export const BASE_URL = 'https://chat.openai.com'
-
 export const APP_TITLE = `Dodo Bot`
 
 export const DEFAULT_MODEL = 'gpt-3.5-turbo'
