@@ -3,7 +3,6 @@ import '@/content-script/styles.scss'
 import classNames from 'classnames'
 import { memo, useEffect, useRef, useState } from 'react'
 import Draggable from 'react-draggable'
-import { animated, useSpring } from 'react-spring'
 
 interface Props {
   animal: string
@@ -14,33 +13,44 @@ interface Props {
 function DodoBird(props: Props) {
   const { animal, message, url } = props
   const [talking, setTalking] = useState(false)
-  const dodoRef = useRef<HTMLDivElement>(null)
+  const [flying, setFlying] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const dodoRef = useRef<HTMLDivElement | null>(null)
 
-  const [{ y }, api] = useSpring(() => ({ y: 0 }))
+  useEffect(() => {
+    // Set initial position at the bottom center
+    const windowWidth = window.innerWidth
+    const windowHeight = window.innerHeight
+    const dodoWidth = dodoRef.current?.offsetWidth || 100
+    const dodoHeight = dodoRef.current?.offsetHeight || 100
+    setPosition({
+      x: (windowWidth - dodoWidth) / 2,
+      y: windowHeight - dodoHeight,
+    })
+  }, [])
 
-  const handleStop = () => {
-    if (dodoRef.current) {
-      const windowHeight = window.innerHeight
-      const dodoHeight = dodoRef.current.clientHeight
-      const targetY = windowHeight - dodoHeight
+  const handleStop = (e, data) => {
+    setFlying(true)
+    const windowHeight = window.innerHeight
+    const dodoHeight = dodoRef.current?.offsetHeight || 100
 
-      api.start({
-        y: targetY,
-        config: { tension: 200, friction: 10, mass: 1 },
-      })
-    }
+    const endY = windowHeight - dodoHeight
+
+    setPosition({ x: data.x, y: endY })
+
+    setTimeout(() => {
+      setFlying(false)
+    }, 1000)
   }
 
   useEffect(() => {
     const handleDragStart = (event: DragEvent) => {
       event.preventDefault()
     }
-
     const node = dodoRef.current
     if (node) {
       node.addEventListener('dragstart', handleDragStart)
     }
-
     return () => {
       if (node) {
         node.removeEventListener('dragstart', handleDragStart)
@@ -49,12 +59,14 @@ function DodoBird(props: Props) {
   }, [])
 
   return (
-    <Draggable onStop={handleStop}>
-      <animated.div
+    <Draggable onStop={handleStop} position={position} disabled={flying}>
+      <div
         ref={dodoRef}
-        className={classNames('dodo-bird', { 'dodo-bird--talking': talking })}
+        className={classNames('dodo-bird', {
+          'dodo-bird--talking': talking,
+          'dodo-bird--flying': flying,
+        })}
         onClick={() => setTalking(!talking)}
-        style={{ y }}
       >
         <img src={logo} alt="Dodo Bird" />
         {talking && (
@@ -62,7 +74,7 @@ function DodoBird(props: Props) {
             <p>{message}</p>
           </div>
         )}
-      </animated.div>
+      </div>
     </Draggable>
   )
 }

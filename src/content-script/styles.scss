@@ -1,9 +1,11 @@
 .dodo-bird {
   position: fixed;
-  bottom: 0;
-  width: auto;
   z-index: 99999999999999;
-  cursor: grab;
+  transition: none; /* Remove transition for dragging */
+}
+
+.dodo-bird.dodo-bird--flying {
+  transition: all 1s ease-in-out; /* Add transition only when flying */
 }
 
 .dodo-bird img {
@@ -11,18 +13,22 @@
   height: auto;
 }
 
-.dodo-bird--inactive img {
-  opacity: 0.8;
-  transition: opacity 0.3s;
+.dodo-bird--flying img {
+  animation: fly 0.5s infinite alternate;
 }
 
-.dodo-bird--talking img {
-  opacity: 1;
+@keyframes fly {
+  0% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(5deg);
+  }
 }
 
 .speech-bubble {
   position: absolute;
-  bottom: 110%; /* Adjust based on the size of the image */
+  bottom: 110%;
   left: 50%;
   transform: translateX(-50%);
   background: white;
@@ -30,5 +36,5 @@
   border-radius: 5px;
   padding: 10px;
   width: 200px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
