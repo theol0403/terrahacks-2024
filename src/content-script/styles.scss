@@ -1,6 +1,82 @@
 @import 'light.scss';
 @import 'dark.scss';
 
+@keyframes fadeInMove {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Web Summary
+.glarity--summary {
+  position: fixed;
+  bottom: 50px;
+  right: 15px;
+  width: auto;
+  z-index: 99999999999999;
+  animation: fadeInMove 0.5s ease-out forwards;
+
+  .glarity--card {
+    width: 360px;
+  }
+}
+
+.dodo-bird {
+  position: relative;
+  cursor: pointer;
+}
+
+.dodo-bird img {
+  width: 100px;
+  height: auto;
+}
+
+.dodo-bird--inactive img {
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.dodo-bird--talking img {
+  opacity: 1;
+}
+
+.speech-bubble {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  transform: translateX(-50%);
+  width: 150px;
+  padding: 10px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.speech-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+.speech-bubble p {
+  margin: 0;
+  font-size: 14px;
+  color: black;
+}
+
+
 .glarity--container {
   position: relative;
   z-index: 1;
@@ -362,18 +438,6 @@ span.glarity--header__logo {
   margin-right: -20px;
 }
 
-// Web Summary
-.glarity--summary {
-  position: fixed;
-  bottom: 050px;
-  right: 15px;
-  width: auto;
-  z-index: 99999999999999;
-
-  .glarity--card {
-    width: 360px;
-  }
-}
 
 // Bilibili
 .glarity--chatgpt--bilibili {

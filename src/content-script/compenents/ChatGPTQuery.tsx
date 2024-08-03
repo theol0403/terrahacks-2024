@@ -4,11 +4,10 @@ import classNames from 'classnames'
 import { debounce } from 'lodash-es'
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { memo, useMemo } from 'react'
-import ReactMarkdown from 'react-markdown'
-import rehypeHighlight from 'rehype-highlight'
 import Browser from 'webextension-polyfill'
 
 import '@/content-script/styles.scss'
+import DodoBird from './DodoBird'
 
 export type QueryStatus = 'success' | 'error' | 'done' | undefined
 
@@ -94,17 +93,18 @@ function ChatGPTQuery(props: Props) {
         behavior: 'smooth',
       })
     }
-  }, [answer])
+  }, [answer]) 
 
   if (answer) {
     return (
-      <div className="markdown-body gpt-markdown" id="gpt-answer" dir="auto">
-        <div className="glarity--chatgpt--content" ref={wrapRef}>
-          <ReactMarkdown rehypePlugins={[[rehypeHighlight, { detect: true }]]}>
-            {answer.text}
-          </ReactMarkdown>
-        </div>
-      </div>
+      <DodoBird animal="Dodo Bird" message={answer.text} url="https://www.openai.com/"></DodoBird>
+      // <div className="markdown-body gpt-markdown" id="gpt-answer" dir="auto">
+      //   <div className="glarity--chatgpt--content" ref={wrapRef}>
+      //     <ReactMarkdown rehypePlugins={[[rehypeHighlight, { detect: true }]]}>
+      //       {answer.text}
+      //     </ReactMarkdown>
+      //   </div>
+      // </div>
     )
   }
 

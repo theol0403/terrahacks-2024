@@ -1,5 +1,4 @@
-import logo from '@/assets/img/logo.png'
-import { APP_TITLE, getUserConfig } from '@/config'
+import { getUserConfig } from '@/config'
 import ChatGPTQuery from '@/content-script/compenents/ChatGPTQuery'
 import { getSummaryPrompt } from '@/content-script/prompt'
 import { getPageSummaryComments, getPageSummaryContntent } from '@/content-script/utils'
@@ -74,26 +73,7 @@ function PageSummary(props: Props) {
     })
   }, [pageSummaryBlacklist, pageSummaryWhitelist, siteRegex])
 
-  if (question)
-    return (
-      <div className="glarity--card">
-        <div className="glarity--card__head ">
-          <div className="glarity--card__head--title">
-            <a href="https://glarity.app" rel="noreferrer" target="_blank">
-              <img src={logo} alt={APP_TITLE} /> {APP_TITLE}
-            </a>{' '}
-          </div>
-        </div>
-
-        <div className="glarity--card__content">
-          <div className="glarity--container">
-            <div className="glarity--chatgpt">
-              <ChatGPTQuery question={question} />
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+  if (question) return <ChatGPTQuery question={question} />
 }
 
 export default PageSummary
