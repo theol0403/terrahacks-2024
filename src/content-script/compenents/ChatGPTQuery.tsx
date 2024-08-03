@@ -93,18 +93,11 @@ function ChatGPTQuery(props: Props) {
         behavior: 'smooth',
       })
     }
-  }, [answer]) 
+  }, [answer])
 
   if (answer) {
     return (
       <DodoBird animal="Dodo Bird" message={answer.text} url="https://www.openai.com/"></DodoBird>
-      // <div className="markdown-body gpt-markdown" id="gpt-answer" dir="auto">
-      //   <div className="glarity--chatgpt--content" ref={wrapRef}>
-      //     <ReactMarkdown rehypePlugins={[[rehypeHighlight, { detect: true }]]}>
-      //       {answer.text}
-      //     </ReactMarkdown>
-      //   </div>
-      // </div>
     )
   }
 
