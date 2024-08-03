@@ -1,7 +1,4 @@
-import { BASE_URL, getUserConfig } from '@/config'
-import { isBraveBrowser, shouldShowRatingTip } from '@/content-script/utils'
 import { Answer } from '@/messaging'
-import { isIOS, isSafari } from '@/utils/utils'
 import { Loading } from '@geist-ui/core'
 import classNames from 'classnames'
 import { debounce } from 'lodash-es'
@@ -27,10 +24,7 @@ function ChatGPTQuery(props: Props) {
 
   const [answer, setAnswer] = useState<Answer | null>(null)
   const [error, setError] = useState('')
-  const [retry, setRetry] = useState(0)
   const [done, setDone] = useState(false)
-  const [showTip, setShowTip] = useState(false)
-  const [continueConversation, setContinueConversation] = useState(false)
   const [status, setStatus] = useState<QueryStatus>()
   const wrapRef = useRef<HTMLDivElement | null>(null)
 
@@ -69,15 +63,6 @@ function ChatGPTQuery(props: Props) {
     }, 1000)
   }, [question])
 
-  const newTab = useCallback(() => {
-    Browser.runtime.sendMessage({
-      type: 'NEW_TAB',
-      data: {
-        url: `${BASE_URL}/chat`,
-      },
-    })
-  }, [])
-
   const openOptionsPage = useCallback(() => {
     Browser.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' })
   }, [])
@@ -88,14 +73,13 @@ function ChatGPTQuery(props: Props) {
 
   useEffect(() => {
     requestGpt()
-  }, [question, retry, currentTime, requestGpt])
+  }, [question, currentTime, requestGpt])
 
   // retry error on focus
   useEffect(() => {
     const onFocus = () => {
       if (error && (error == 'UNAUTHORIZED' || error === 'CLOUDFLARE')) {
         setError('')
-        setRetry((r) => r + 1)
       }
     }
     window.addEventListener('focus', onFocus)
@@ -103,14 +87,6 @@ function ChatGPTQuery(props: Props) {
       window.removeEventListener('focus', onFocus)
     }
   }, [error])
-
-  useEffect(() => {
-    shouldShowRatingTip().then((show) => setShowTip(show))
-  }, [])
-
-  useEffect(() => {
-    getUserConfig().then((settings) => setContinueConversation(settings.continueConversation))
-  }, [])
 
   useEffect(() => {
     const wrap: HTMLDivElement | null = wrapRef.current
@@ -141,26 +117,6 @@ function ChatGPTQuery(props: Props) {
             {answer.text}
           </ReactMarkdown>
         </div>
-        {continueConversation && answer.conversationId && done && (
-          <div>
-            <a href={`https://chat.openai.com/c/${answer.conversationId}`} target="_blank">
-              Continue conversation
-            </a>
-          </div>
-        )}
-
-        {/* {done && showTip && (
-          <p className="glarity--italic glarity--mt-2">
-            Enjoy this extension? Give us a 5-star rating at{' '}
-            <a
-              href="https://chatgpt4google.com/chrome?utm_source=rating_tip"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Chrome Web Store
-            </a>
-          </p>
-        )} */}
       </div>
     )
   }
@@ -168,7 +124,7 @@ function ChatGPTQuery(props: Props) {
   if (error === 'UNAUTHORIZED' || error === 'CLOUDFLARE') {
     return (
       <p>
-        {isSafari ? (
+        {
           <>
             Please set OpenAI API Key in the{' '}
             <button
@@ -179,52 +135,7 @@ function ChatGPTQuery(props: Props) {
             </button>
             .
           </>
-        ) : (
-          <>
-            {' '}
-            Please login and pass Cloudflare check at{' '}
-            <button
-              className={classNames('glarity--btn', 'glarity--btn__primary', 'glarity--btn__small')}
-              onClick={newTab}
-            >
-              chat.openai.com
-            </button>
-            .
-          </>
-        )}
-
-        {retry > 0 &&
-          !isIOS &&
-          (() => {
-            if (isBraveBrowser()) {
-              return (
-                <span className="glarity--block glarity--mt-2">
-                  Still not working? Follow{' '}
-                  <a href="https://github.com/sparticleinc/chatgpt-google-summary-extension#troubleshooting">
-                    Brave Troubleshooting
-                  </a>
-                </span>
-              )
-            } else {
-              return (
-                <span className="glarity--italic glarity--block glarity--mt-2 glarity--text-xs">
-                  OpenAI requires passing a security check every once in a while. If this keeps
-                  happening, change AI provider to OpenAI API in the{' '}
-                  <button
-                    className={classNames(
-                      'glarity--btn',
-                      'glarity--btn__primary',
-                      'glarity--btn__small',
-                    )}
-                    onClick={openOptionsPage}
-                  >
-                    extension options
-                  </button>
-                  .
-                </span>
-              )
-            }
-          })()}
+        }
       </p>
     )
   }
@@ -237,7 +148,6 @@ function ChatGPTQuery(props: Props) {
           href="javascript:void(0)"
           onClick={() => {
             setError('')
-            setRetry((r) => r + 1)
           }}
         >
           Retry

@@ -1,5 +1,5 @@
 import ChatGPTQuery from '@/content-script/compenents/ChatGPTQuery'
-import { GearIcon, XCircleFillIcon } from '@primer/octicons-react'
+import { XCircleFillIcon } from '@primer/octicons-react'
 import classNames from 'classnames'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 import Browser from 'webextension-polyfill'
@@ -38,10 +38,6 @@ function PageSummary(props: Props) {
 
       return cardState
     })
-  }, [])
-
-  const openOptionsPage = useCallback(() => {
-    Browser.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' })
   }, [])
 
   const onSummary = useCallback(async () => {
@@ -128,12 +124,6 @@ function PageSummary(props: Props) {
               <a href="https://glarity.app" rel="noreferrer" target="_blank">
                 <img src={logo} alt={APP_TITLE} /> {APP_TITLE}
               </a>{' '}
-              <button
-                className={classNames('glarity--btn', 'glarity--btn__icon')}
-                onClick={openOptionsPage}
-              >
-                <GearIcon size={14} />
-              </button>
             </div>
 
             <div className="glarity--card__head--action">
