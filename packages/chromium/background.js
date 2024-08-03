@@ -1023,6 +1023,126 @@
   // src/background/index.ts
   var import_webextension_polyfill3 = __toESM(require_browser_polyfill());
 
+  // node_modules/eventsource-parser/dist/index.mjs
+  function createParser(onParse) {
+    let isFirstChunk;
+    let buffer;
+    let startingPosition;
+    let startingFieldLength;
+    let eventId;
+    let eventName;
+    let data;
+    reset();
+    return {
+      feed,
+      reset
+    };
+    function reset() {
+      isFirstChunk = true;
+      buffer = "";
+      startingPosition = 0;
+      startingFieldLength = -1;
+      eventId = void 0;
+      eventName = void 0;
+      data = "";
+    }
+    function feed(chunk) {
+      buffer = buffer ? buffer + chunk : chunk;
+      if (isFirstChunk && hasBom(buffer)) {
+        buffer = buffer.slice(BOM.length);
+      }
+      isFirstChunk = false;
+      const length = buffer.length;
+      let position = 0;
+      let discardTrailingNewline = false;
+      while (position < length) {
+        if (discardTrailingNewline) {
+          if (buffer[position] === "\n") {
+            ++position;
+          }
+          discardTrailingNewline = false;
+        }
+        let lineLength = -1;
+        let fieldLength = startingFieldLength;
+        let character;
+        for (let index = startingPosition; lineLength < 0 && index < length; ++index) {
+          character = buffer[index];
+          if (character === ":" && fieldLength < 0) {
+            fieldLength = index - position;
+          } else if (character === "\r") {
+            discardTrailingNewline = true;
+            lineLength = index - position;
+          } else if (character === "\n") {
+            lineLength = index - position;
+          }
+        }
+        if (lineLength < 0) {
+          startingPosition = length - position;
+          startingFieldLength = fieldLength;
+          break;
+        } else {
+          startingPosition = 0;
+          startingFieldLength = -1;
+        }
+        parseEventStreamLine(buffer, position, fieldLength, lineLength);
+        position += lineLength + 1;
+      }
+      if (position === length) {
+        buffer = "";
+      } else if (position > 0) {
+        buffer = buffer.slice(position);
+      }
+    }
+    function parseEventStreamLine(lineBuffer, index, fieldLength, lineLength) {
+      if (lineLength === 0) {
+        if (data.length > 0) {
+          onParse({
+            type: "event",
+            id: eventId,
+            event: eventName || void 0,
+            data: data.slice(0, -1)
+          });
+          data = "";
+          eventId = void 0;
+        }
+        eventName = void 0;
+        return;
+      }
+      const noValue = fieldLength < 0;
+      const field = lineBuffer.slice(index, index + (noValue ? lineLength : fieldLength));
+      let step = 0;
+      if (noValue) {
+        step = lineLength;
+      } else if (lineBuffer[index + fieldLength + 1] === " ") {
+        step = fieldLength + 2;
+      } else {
+        step = fieldLength + 1;
+      }
+      const position = index + step;
+      const valueLength = lineLength - step;
+      const value = lineBuffer.slice(position, position + valueLength).toString();
+      if (field === "data") {
+        data += value ? "".concat(value, "\n") : "\n";
+      } else if (field === "event") {
+        eventName = value;
+      } else if (field === "id" && !value.includes("\0")) {
+        eventId = value;
+      } else if (field === "retry") {
+        const retry = parseInt(value, 10);
+        if (!Number.isNaN(retry)) {
+          onParse({
+            type: "reconnect-interval",
+            value: retry
+          });
+        }
+      }
+    }
+  }
+  var BOM = [239, 187, 191];
+  function hasBom(buffer) {
+    return BOM.every((charCode, index) => buffer.charCodeAt(index) === charCode);
+  }
+
   // node_modules/lodash-es/_freeGlobal.js
   var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
   var freeGlobal_default = freeGlobal;
@@ -1404,133 +1524,6 @@
   }
   var isEmpty_default = isEmpty;
 
-  // src/config/index.ts
-  var import_webextension_polyfill = __toESM(require_browser_polyfill());
-  var BASE_URL = "https://chat.openai.com";
-  var DEFAULT_MODEL = "gpt-3.5-turbo";
-  var DEFAULT_API_HOST = "api.openai.com";
-  var SECRET_KEY = "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";
-
-  // node_modules/eventsource-parser/dist/index.mjs
-  function createParser(onParse) {
-    let isFirstChunk;
-    let buffer;
-    let startingPosition;
-    let startingFieldLength;
-    let eventId;
-    let eventName;
-    let data;
-    reset();
-    return {
-      feed,
-      reset
-    };
-    function reset() {
-      isFirstChunk = true;
-      buffer = "";
-      startingPosition = 0;
-      startingFieldLength = -1;
-      eventId = void 0;
-      eventName = void 0;
-      data = "";
-    }
-    function feed(chunk) {
-      buffer = buffer ? buffer + chunk : chunk;
-      if (isFirstChunk && hasBom(buffer)) {
-        buffer = buffer.slice(BOM.length);
-      }
-      isFirstChunk = false;
-      const length = buffer.length;
-      let position = 0;
-      let discardTrailingNewline = false;
-      while (position < length) {
-        if (discardTrailingNewline) {
-          if (buffer[position] === "\n") {
-            ++position;
-          }
-          discardTrailingNewline = false;
-        }
-        let lineLength = -1;
-        let fieldLength = startingFieldLength;
-        let character;
-        for (let index = startingPosition; lineLength < 0 && index < length; ++index) {
-          character = buffer[index];
-          if (character === ":" && fieldLength < 0) {
-            fieldLength = index - position;
-          } else if (character === "\r") {
-            discardTrailingNewline = true;
-            lineLength = index - position;
-          } else if (character === "\n") {
-            lineLength = index - position;
-          }
-        }
-        if (lineLength < 0) {
-          startingPosition = length - position;
-          startingFieldLength = fieldLength;
-          break;
-        } else {
-          startingPosition = 0;
-          startingFieldLength = -1;
-        }
-        parseEventStreamLine(buffer, position, fieldLength, lineLength);
-        position += lineLength + 1;
-      }
-      if (position === length) {
-        buffer = "";
-      } else if (position > 0) {
-        buffer = buffer.slice(position);
-      }
-    }
-    function parseEventStreamLine(lineBuffer, index, fieldLength, lineLength) {
-      if (lineLength === 0) {
-        if (data.length > 0) {
-          onParse({
-            type: "event",
-            id: eventId,
-            event: eventName || void 0,
-            data: data.slice(0, -1)
-          });
-          data = "";
-          eventId = void 0;
-        }
-        eventName = void 0;
-        return;
-      }
-      const noValue = fieldLength < 0;
-      const field = lineBuffer.slice(index, index + (noValue ? lineLength : fieldLength));
-      let step = 0;
-      if (noValue) {
-        step = lineLength;
-      } else if (lineBuffer[index + fieldLength + 1] === " ") {
-        step = fieldLength + 2;
-      } else {
-        step = fieldLength + 1;
-      }
-      const position = index + step;
-      const valueLength = lineLength - step;
-      const value = lineBuffer.slice(position, position + valueLength).toString();
-      if (field === "data") {
-        data += value ? "".concat(value, "\n") : "\n";
-      } else if (field === "event") {
-        eventName = value;
-      } else if (field === "id" && !value.includes("\0")) {
-        eventId = value;
-      } else if (field === "retry") {
-        const retry = parseInt(value, 10);
-        if (!Number.isNaN(retry)) {
-          onParse({
-            type: "reconnect-interval",
-            value: retry
-          });
-        }
-      }
-    }
-  }
-  var BOM = [239, 187, 191];
-  function hasBom(buffer) {
-    return BOM.every((charCode, index) => buffer.charCodeAt(index) === charCode);
-  }
-
   // src/background/stream-async-iterable.ts
   async function* streamAsyncIterable(stream) {
     const reader = stream.getReader();
@@ -1565,6 +1558,12 @@
       parser.feed(str);
     }
   }
+
+  // src/config/index.ts
+  var import_webextension_polyfill = __toESM(require_browser_polyfill());
+  var DEFAULT_MODEL = "gpt-3.5-turbo";
+  var DEFAULT_API_HOST = "api.openai.com";
+  var SECRET_KEY = "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";
 
   // src/background/providers/openai.ts
   var OpenAIProvider = class {
@@ -1649,16 +1648,6 @@ ChatGPT:`;
   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   var isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  function tabSendMsg(tab) {
-    const { id, url } = tab;
-    if (url.includes(`${BASE_URL}/chat`)) {
-      import_webextension_polyfill2.default.tabs.sendMessage(id, { type: "CHATGPT_TAB_CURRENT", data: { isLogin: true } }).catch(() => {
-      });
-    } else {
-      import_webextension_polyfill2.default.tabs.sendMessage(id, { type: "CHATGPT_TAB_CURRENT", data: { isLogin: false } }).catch(() => {
-      });
-    }
-  }
 
   // src/background/index.ts
   async function generateAnswers(port, question) {
@@ -1733,22 +1722,6 @@ ChatGPT:`;
         import_webextension_polyfill3.default.tabs.create({ url: "about:newtab", active: true });
       }
     }
-  });
-  import_webextension_polyfill3.default.runtime.onInstalled.addListener(async (details) => {
-    if (details.reason === "install") {
-      import_webextension_polyfill3.default.runtime.openOptionsPage();
-    }
-  });
-  import_webextension_polyfill3.default.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-    const oldTabId = await import_webextension_polyfill3.default.storage.local.get("pinnedTabId");
-    import_webextension_polyfill3.default.tabs.get(tabId).then((tab) => {
-      var _a;
-      console.log("tabId", tabId, tab, changeInfo);
-      if (((_a = tab.url) == null ? void 0 : _a.includes(BASE_URL)) && changeInfo.status === "complete" && tab.id && oldTabId.pinnedTabId === tab.id) {
-        console.log("onUpdated", oldTabId, tab);
-        tabSendMsg(tab);
-      }
-    });
   });
   async function openPageSummary(tab) {
     const { id } = tab;

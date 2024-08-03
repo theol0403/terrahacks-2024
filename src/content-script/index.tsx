@@ -1,14 +1,13 @@
-import { render } from 'preact'
 import '@/assets/styles/base.scss'
 import { getUserConfig } from '@/config'
-import ChatGPTTip from '@/content-script/compenents/ChatGPTTip'
-import { config } from '@/content-script/search-engine-configs'
-import Browser from 'webextension-polyfill'
-import PageSummary from '@/content-script/compenents/PageSummary'
 import mount from '@/content-script/compenents/Mount'
+import PageSummary from '@/content-script/compenents/PageSummary'
+import { config } from '@/content-script/search-engine-configs'
+import '@/content-script/styles.scss'
+import { render } from 'preact'
+import Browser from 'webextension-polyfill'
 import getQuestion from './compenents/GetQuestion'
 import { siteConfig as sietConfigFn } from './utils'
-import '@/content-script/styles.scss'
 
 const siteConfig = sietConfigFn()
 
@@ -40,16 +39,8 @@ async function Run() {
   }
 
   Browser.runtime.onMessage.addListener((message, _, sendResponse) => {
-    const { type, data } = message
+    const { type } = message
     switch (type) {
-      case 'CHATGPT_TAB_CURRENT': {
-        const container = document.createElement('section')
-        container.className = 'glarity--chatgpt--tips'
-        container.id = 'glarity--chatgpt--tips'
-        document.body.prepend(container)
-        render(<ChatGPTTip isLogin={data.isLogin} />, container)
-        break
-      }
       case 'GET_DOM': {
         sendResponse({ html: document.querySelector('html')?.outerHTML })
         break

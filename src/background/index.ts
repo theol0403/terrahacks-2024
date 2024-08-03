@@ -2,7 +2,7 @@ import Browser from 'webextension-polyfill'
 import { BASE_URL } from '@/config'
 import { OpenAIProvider } from './providers/openai'
 import { Provider } from './types'
-import { isFirefox, tabSendMsg } from '@/utils/utils'
+import { isFirefox, } from '@/utils/utils'
 
 async function generateAnswers(port: Browser.Runtime.Port, question: string) {
 
@@ -86,43 +86,6 @@ Browser.runtime.onMessage.addListener(async (message) => {
       Browser.tabs.create({ url: 'about:newtab', active: true })
     }
   }
-})
-
-Browser.runtime.onInstalled.addListener(async (details) => {
-  if (details.reason === 'install') {
-    Browser.runtime.openOptionsPage()
-  }
-})
-
-Browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-  const oldTabId = await Browser.storage.local.get('pinnedTabId')
-
-  Browser.tabs.get(tabId).then((tab) => {
-    console.log('tabId', tabId, tab, changeInfo)
-
-    // Browser.tabs.query({}).then((tabs) => {
-    //   tabs.forEach((tab) => {
-    //     if (
-    //       changeInfo.status === 'complete' &&
-    //       tab.id &&
-    //       tab.id &&
-    //       oldTabId.pinnedTabId === tab.id
-    //     ) {
-    //       Browser.runtime.sendMessage(tab.id, { type: 'CHATGPT_TAB_CURRENT_' }).catch(() => {})
-    //     }
-    //   })
-    // })
-
-    if (
-      tab.url?.includes(BASE_URL) &&
-      changeInfo.status === 'complete' &&
-      tab.id &&
-      oldTabId.pinnedTabId === tab.id
-    ) {
-      console.log('onUpdated', oldTabId, tab)
-      tabSendMsg(tab)
-    }
-  })
 })
 
 async function openPageSummary(tab) {

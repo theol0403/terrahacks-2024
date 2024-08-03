@@ -24,16 +24,3 @@ export const changeToast: { type: 'success'; text: string } = {
   text: 'Changes saved',
   type: 'success',
 }
-
-export function tabSendMsg(tab) {
-  const { id, url } = tab
-  if (url.includes(`${BASE_URL}/chat`)) {
-    Browser.tabs
-      .sendMessage(id, { type: 'CHATGPT_TAB_CURRENT', data: { isLogin: true } })
-      .catch(() => {})
-  } else {
-    Browser.tabs
-      .sendMessage(id, { type: 'CHATGPT_TAB_CURRENT', data: { isLogin: false } })
-      .catch(() => {})
-  }
-}
