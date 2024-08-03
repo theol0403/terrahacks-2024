@@ -162,9 +162,6 @@
 .glarity--w-5 {
   width: 1.25rem;
 }
-.glarity--cursor-pointer {
-  cursor: pointer;
-}
 .glarity--flex-row {
   flex-direction: row;
 }
@@ -197,9 +194,6 @@
 }
 .glarity--italic {
   font-style: italic;
-}
-.glarity--underline {
-  text-decoration-line: underline;
 }
 .glarity--card {
   font-size: 14px;
