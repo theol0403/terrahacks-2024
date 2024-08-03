@@ -82,6 +82,10 @@ async function build() {
     { src: 'build/content-script/index.css', dst: 'content-script.css' },
     { src: 'build/background/index.js', dst: 'background.js' },
     { src: 'src/options/index.html', dst: 'options.html' },
+    { src: 'src/assets/img/logo-16.png', dst: 'logo-16.png' },
+    { src: 'src/assets/img/logo-32.png', dst: 'logo-32.png' },
+    { src: 'src/assets/img/logo-48.png', dst: 'logo-48.png' },
+    { src: 'src/assets/img/logo-128.png', dst: 'logo-128.png' },
     { src: 'src/assets/img/logo.png', dst: 'logo.png' },
   ]
 
