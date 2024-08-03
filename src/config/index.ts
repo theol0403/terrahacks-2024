@@ -38,7 +38,7 @@ export async function getUserConfig(): Promise<UserConfig> {
 
 export const BASE_URL = 'https://chat.openai.com'
 
-export const APP_TITLE = `Glarity Summary`
+export const APP_TITLE = `Dodo Bot`
 
 export const DEFAULT_MODEL = 'gpt-3.5-turbo'
 export const DEFAULT_API_HOST = 'api.openai.com'

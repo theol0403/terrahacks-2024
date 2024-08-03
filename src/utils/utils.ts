@@ -2,9 +2,6 @@ import Browser from 'webextension-polyfill'
 import { Theme } from '@/config'
 
 
-export const isFirefox = navigator.userAgent.indexOf('Firefox') != -1
-
-export const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 export const AppName = 'Glarity-Summary for Google/YouTube (ChatGPT)'
 

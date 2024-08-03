@@ -1,8 +1,5 @@
 import Browser from 'webextension-polyfill'
-import { BASE_URL } from '@/config'
 import { OpenAIProvider } from './providers/openai'
-import { Provider } from './types'
-import { isFirefox, } from '@/utils/utils'
 
 async function generateAnswers(port: Browser.Runtime.Port, question: string) {
 
@@ -88,22 +85,3 @@ Browser.runtime.onMessage.addListener(async (message) => {
   }
 })
 
-async function openPageSummary(tab) {
-  const { id } = tab
-
-  if (!id) {
-    return
-  }
-
-  Browser.tabs.sendMessage(id, { type: 'OPEN_WEB_SUMMARY', data: {} }).catch(() => { })
-}
-
-if (isFirefox) {
-  Browser.browserAction.onClicked.addListener(async (tab) => {
-    await openPageSummary(tab)
-  })
-} else {
-  Browser.action.onClicked.addListener(async (tab) => {
-    await openPageSummary(tab)
-  })
-}
