@@ -135,9 +135,6 @@
     max-width: 1536px;
   }
 }
-.glarity--mt-2 {
-  margin-top: 0.5rem;
-}
 .glarity--block {
   display: block;
 }
@@ -152,13 +149,6 @@
 }
 .glarity--rounded-sm {
   border-radius: 0.125rem;
-}
-.glarity--text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-.glarity--italic {
-  font-style: italic;
 }
 .glarity--card {
   font-size: 14px;

@@ -7,7 +7,6 @@ import { memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import Browser from 'webextension-polyfill'
-import ChatGPTFeedback from './ChatGPTFeedback'
 
 import '@/content-script/styles.scss'
 
@@ -24,7 +23,6 @@ function ChatGPTQuery(props: Props) {
 
   const [answer, setAnswer] = useState<Answer | null>(null)
   const [error, setError] = useState('')
-  const [done, setDone] = useState(false)
   const [status, setStatus] = useState<QueryStatus>()
   const wrapRef = useRef<HTMLDivElement | null>(null)
 
@@ -33,9 +31,6 @@ function ChatGPTQuery(props: Props) {
 
     return debounce(() => {
       setStatus(undefined)
-      // setError('error')
-      // setStatus('error')
-      // return
 
       const port = Browser.runtime.connect()
       const listener = (msg: any) => {
@@ -50,7 +45,6 @@ function ChatGPTQuery(props: Props) {
           setError(msg.error)
           setStatus('error')
         } else if (msg.event === 'DONE') {
-          setDone(true)
           setStatus('done')
         }
       }
@@ -105,13 +99,6 @@ function ChatGPTQuery(props: Props) {
   if (answer) {
     return (
       <div className="markdown-body gpt-markdown" id="gpt-answer" dir="auto">
-        <div className="glarity--chatgpt--header">
-          <ChatGPTFeedback
-            messageId={answer.messageId}
-            conversationId={answer.conversationId}
-            answerText={answer.text}
-          />
-        </div>
         <div className="glarity--chatgpt--content" ref={wrapRef}>
           <ReactMarkdown rehypePlugins={[[rehypeHighlight, { detect: true }]]}>
             {answer.text}

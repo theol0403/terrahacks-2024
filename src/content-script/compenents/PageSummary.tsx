@@ -1,26 +1,24 @@
-import ChatGPTQuery from '@/content-script/compenents/ChatGPTQuery'
-import { XCircleFillIcon } from '@primer/octicons-react'
-import classNames from 'classnames'
-import { useCallback, useEffect, useState } from 'preact/hooks'
-import Browser from 'webextension-polyfill'
-// import { extractFromHtml } from '@/utils/article-extractor/cjs/article-extractor.esm'
 import logoWhite from '@/assets/img/logo-white.png'
 import logo from '@/assets/img/logo.png'
 import { APP_TITLE, getUserConfig } from '@/config'
+import ChatGPTQuery from '@/content-script/compenents/ChatGPTQuery'
 import { getSummaryPrompt } from '@/content-script/prompt'
 import { getPageSummaryComments, getPageSummaryContntent } from '@/content-script/utils'
 import { commentSummaryPrompt, pageSummaryPrompt, pageSummaryPromptHighlight } from '@/utils/prompt'
 import { isIOS } from '@/utils/utils'
+import { XCircleFillIcon } from '@primer/octicons-react'
+import classNames from 'classnames'
+import { useCallback, useEffect, useState } from 'preact/hooks'
+import Browser from 'webextension-polyfill'
 
 interface Props {
-  pageSummaryEnable: boolean
   pageSummaryWhitelist: string
   pageSummaryBlacklist: string
   siteRegex: RegExp
 }
 
 function PageSummary(props: Props) {
-  const { pageSummaryEnable, pageSummaryWhitelist, pageSummaryBlacklist, siteRegex } = props
+  const { pageSummaryWhitelist, pageSummaryBlacklist, siteRegex } = props
   const [showCard, setShowCard] = useState(false)
   const [supportSummary, setSupportSummary] = useState(true)
   const [question, setQuestion] = useState('')
@@ -109,11 +107,10 @@ function PageSummary(props: Props) {
       ? !blacklist.includes(hostname)
       : !blacklist.includes(hostname) && pageSummaryWhitelist.includes(hostname)
 
-    const show =
-      pageSummaryEnable && ((isIOS && inWhitelist) || (inWhitelist && !siteRegex?.test(hostname)))
+    const show = (isIOS && inWhitelist) || (inWhitelist && !siteRegex?.test(hostname))
 
     setShow(show)
-  }, [pageSummaryBlacklist, pageSummaryEnable, pageSummaryWhitelist, siteRegex])
+  }, [pageSummaryBlacklist, pageSummaryWhitelist, siteRegex])
 
   return (
     <>

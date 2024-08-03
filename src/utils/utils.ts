@@ -1,7 +1,6 @@
 import Browser from 'webextension-polyfill'
-import { Theme, BASE_URL } from '@/config'
+import { Theme } from '@/config'
 
-export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 
 export const isFirefox = navigator.userAgent.indexOf('Firefox') != -1
 

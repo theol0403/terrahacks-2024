@@ -25,7 +25,6 @@ async function Run() {
   document.body.prepend(container)
   render(
     <PageSummary
-      pageSummaryEnable={userConfig.pageSummaryEnable}
       pageSummaryWhitelist={userConfig.pageSummaryWhitelist}
       pageSummaryBlacklist={userConfig.pageSummaryBlacklist}
       siteRegex={siteRegex}

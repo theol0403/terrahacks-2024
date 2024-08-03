@@ -1645,7 +1645,6 @@ ChatGPT:`;
 
   // src/utils/utils.ts
   var import_webextension_polyfill2 = __toESM(require_browser_polyfill());
-  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   var isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
