@@ -1,16 +1,16 @@
-import { useState, useCallback, useEffect } from 'preact/hooks'
-import classNames from 'classnames'
-import { XCircleFillIcon, GearIcon } from '@primer/octicons-react'
-import Browser from 'webextension-polyfill'
 import ChatGPTQuery from '@/content-script/compenents/ChatGPTQuery'
+import { GearIcon, XCircleFillIcon } from '@primer/octicons-react'
+import classNames from 'classnames'
+import { useCallback, useEffect, useState } from 'preact/hooks'
+import Browser from 'webextension-polyfill'
 // import { extractFromHtml } from '@/utils/article-extractor/cjs/article-extractor.esm'
-import { getUserConfig, Language, getProviderConfigs, APP_TITLE } from '@/config'
-import { getSummaryPrompt } from '@/content-script/prompt'
-import { isIOS } from '@/utils/utils'
-import { getPageSummaryContntent, getPageSummaryComments } from '@/content-script/utils'
-import { commentSummaryPrompt, pageSummaryPrompt, pageSummaryPromptHighlight } from '@/utils/prompt'
 import logoWhite from '@/assets/img/logo-white.png'
 import logo from '@/assets/img/logo.png'
+import { APP_TITLE, getUserConfig } from '@/config'
+import { getSummaryPrompt } from '@/content-script/prompt'
+import { getPageSummaryComments, getPageSummaryContntent } from '@/content-script/utils'
+import { commentSummaryPrompt, pageSummaryPrompt, pageSummaryPromptHighlight } from '@/utils/prompt'
+import { isIOS } from '@/utils/utils'
 
 interface Props {
   pageSummaryEnable: boolean
@@ -64,18 +64,13 @@ function PageSummary(props: Props) {
     if (article?.content || description) {
       const language = window.navigator.language
       const userConfig = await getUserConfig()
-      const providerConfigs = await getProviderConfigs()
 
-      const promptContent = getSummaryPrompt(
-        content.replace(/(<[^>]+>|\{[^}]+\})/g, ''),
-        providerConfigs.provider,
-      )
-      const replyLanguage = userConfig.language === Language.Auto ? language : userConfig.language
+      const promptContent = getSummaryPrompt(content.replace(/(<[^>]+>|\{[^}]+\})/g, ''))
 
       const prompt = pageComments?.content
         ? commentSummaryPrompt({
             content: promptContent,
-            language: replyLanguage,
+            language: language,
             prompt: userConfig.promptComment
               ? userConfig.promptComment
               : pageSummaryPromptHighlight,
@@ -83,7 +78,7 @@ function PageSummary(props: Props) {
           })
         : pageSummaryPrompt({
             content: promptContent,
-            language: replyLanguage,
+            language: language,
             prompt: userConfig.promptPage ? userConfig.promptPage : pageSummaryPromptHighlight,
           })
 

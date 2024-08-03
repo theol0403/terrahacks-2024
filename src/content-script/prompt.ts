@@ -1,17 +1,16 @@
-import { ProviderType } from '@/config'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
 
-export function getSummaryPrompt(transcript = '', providerConfigs?: ProviderType) {
+export function getSummaryPrompt(transcript = '') {
   const text = transcript
     ? transcript
-        .replace(/&#39;/g, "'")
-        .replace(/(\r\n)+/g, '\r\n')
-        .replace(/(\s{2,})/g, ' ')
-        .replace(/^(\s)+|(\s)$/g, '')
+      .replace(/&#39;/g, "'")
+      .replace(/(\r\n)+/g, '\r\n')
+      .replace(/(\s{2,})/g, ' ')
+      .replace(/^(\s)+|(\s)$/g, '')
     : ''
 
-  return truncateTranscript(text, providerConfigs)
+  return truncateTranscript(text)
 }
 
 // Seems like 15,000 bytes is the limit for the prompt
@@ -85,7 +84,7 @@ export function getChunckedTranscripts(textData, textDataOriginal) {
   return result == '' ? originalText : result // Just in case the result is empty
 }
 
-function truncateTranscript(str, providerConfigs) {
+function truncateTranscript(str) {
   let textStr = str
 
   const textBytes = textToBinaryString(str).length
@@ -95,7 +94,7 @@ function truncateTranscript(str, providerConfigs) {
     textStr = newStr
   }
 
-  const tokenLimit = providerConfigs === ProviderType.GPT3 ? apiLimit : limit
+  const tokenLimit = apiLimit
 
   // if (providerConfigs === ProviderType.GPT3) {
   const encoded: { bpe: number[]; text: string[] } = tokenizer.encode(textStr)
@@ -120,22 +119,6 @@ function truncateTranscript(str, providerConfigs) {
   // }
 }
 
-function truncateTranscriptByToken(str, providerConfigs) {
-  const tokenLimit = providerConfigs === ProviderType.GPT3 ? apiLimit : limit
-
-  // if (providerConfigs === ProviderType.GPT3) {
-  const encoded: { bpe: number[]; text: string[] } = tokenizer.encode(str)
-  const bytes = encoded.bpe.length
-
-  if (bytes > tokenLimit) {
-    const ratio = tokenLimit / bytes
-    const newStr = str.substring(0, str.length * ratio)
-
-    return newStr
-  }
-
-  return str
-}
 
 export function textToBinaryString(str) {
   const escstr = decodeURIComponent(encodeURIComponent(escape(str)))

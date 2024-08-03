@@ -1,22 +1,22 @@
-import { getUserConfig, getProviderConfigs, Language } from '@/config'
+import { getUserConfig } from '@/config'
 import { getSummaryPrompt } from '@/content-script/prompt'
+import {
+  getConverTranscript,
+  getLangOptionsWithLink,
+  getPossibleElementByQuerySelector,
+  siteConfig as sietConfigFn,
+  siteName as siteNameFn,
+  waitForElm,
+} from '@/content-script/utils'
 import {
   articlePrompt,
   googlePatentsPromptHighlight,
-  videoPrompt,
   searchPrompt,
-  videoSummaryPromptHightligt,
   searchPromptHighlight,
+  videoPrompt,
+  videoSummaryPromptHightligt,
 } from '@/utils/prompt'
-import {
-  getPossibleElementByQuerySelector,
-  getLangOptionsWithLink,
-  waitForElm,
-  getConverTranscript,
-} from '@/content-script/utils'
-import { getBiliTranscript, getBiliVideoId } from '@/utils/bilibili'
 import { queryParam } from 'gb-url'
-import { siteConfig as sietConfigFn, siteName as siteNameFn } from '@/content-script/utils'
 
 export default async function getQuestion() {
   const siteConfig = sietConfigFn()
@@ -28,8 +28,6 @@ export default async function getQuestion() {
 
   const language = window.navigator.language
   const userConfig = await getUserConfig()
-
-  const providerConfigs = await getProviderConfigs()
 
   // PubMed
   if (siteName === 'pubmed') {
@@ -75,12 +73,12 @@ export default async function getQuestion() {
     if (!articleText) {
       return null
     }
-    const content = getSummaryPrompt(articleText, providerConfigs.provider)
+    const content = getSummaryPrompt(articleText)
 
     const queryText = articlePrompt({
       title: articleTitle,
       content: content,
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      language: language,
     })
 
     return { question: queryText }
@@ -101,12 +99,12 @@ export default async function getQuestion() {
     if (!articleText) {
       return null
     }
-    const content = getSummaryPrompt(articleText, providerConfigs.provider)
+    const content = getSummaryPrompt(articleText)
 
     const queryText = articlePrompt({
       title: articleTitle,
       content: content,
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      language: language,
     })
 
     return { question: queryText }
@@ -128,12 +126,12 @@ export default async function getQuestion() {
       return null
     }
 
-    const content = getSummaryPrompt(articleText, providerConfigs.provider)
+    const content = getSummaryPrompt(articleText)
 
     const queryText = articlePrompt({
       title: articleTitle,
       content: content,
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      language: language,
     })
 
     return { question: queryText }
@@ -155,12 +153,12 @@ export default async function getQuestion() {
       return null
     }
 
-    const content = getSummaryPrompt(articleText, providerConfigs.provider)
+    const content = getSummaryPrompt(articleText)
 
     const queryText = articlePrompt({
       title: articleTitle,
       content: content,
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      language: language,
     })
 
     return { question: queryText }
@@ -182,12 +180,12 @@ export default async function getQuestion() {
       return null
     }
 
-    const content = getSummaryPrompt(articleText, providerConfigs.provider)
+    const content = getSummaryPrompt(articleText)
 
     const queryText = articlePrompt({
       title: articleTitle,
       content: content,
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      language: language,
     })
 
     return { question: queryText }
@@ -218,12 +216,12 @@ export default async function getQuestion() {
       return null
     }
 
-    const content = getSummaryPrompt(articleText, providerConfigs.provider)
+    const content = getSummaryPrompt(articleText)
 
     const queryText = articlePrompt({
       title: articleTitle,
       content: content,
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      language: language,
       prompt: googlePatentsPromptHighlight,
     })
 
@@ -256,8 +254,8 @@ export default async function getQuestion() {
 
     const queryText = videoPrompt({
       title: videoTitle,
-      transcript: getSummaryPrompt(transcript, providerConfigs.provider),
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      transcript: getSummaryPrompt(transcript),
+      language: language,
       prompt: Instructions,
     })
 
@@ -268,55 +266,11 @@ export default async function getQuestion() {
     }
   }
 
-  // Bilibili
-  if (siteName === 'bilibili') {
-    const id = getBiliVideoId(window.location.href)
-    if (!id) {
-      return
-    }
-
-    const transcriptList = await getBiliTranscript(window.location.href)
-
-    if (!transcriptList) {
-      return
-    }
-
-    const { transcript = [], desc } = transcriptList
-    const videoTitle = document.title
-    let videoDesc =
-      document?.querySelector('meta[name="description"]')?.getAttribute('content') || ''
-    videoDesc = videoDesc.split('视频播放量')[0]
-
-    const content = transcript
-      ? (
-          transcript.map((v) => {
-            return `${v.content}`
-          }) || []
-        ).join('')
-      : desc + videoDesc
-
-    const Instructions = userConfig.prompt ? `${userConfig.prompt}` : videoSummaryPromptHightligt
-
-    const queryText = videoPrompt({
-      title: videoTitle,
-      transcript: getSummaryPrompt(content, providerConfigs.provider),
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
-      prompt: Instructions,
-    })
-
-    return {
-      question: content ? queryText : null,
-    }
-  }
-
   // bing
   if (siteName === 'bing') {
     const searchInput = getPossibleElementByQuerySelector<HTMLInputElement>(siteConfig.inputQuery)
     if (!searchInput) return null
-    const searchValueWithLanguageOption =
-      userConfig.language === Language.Auto
-        ? searchInput.value
-        : `${searchInput.value}(in ${userConfig.language})`
+    const searchValueWithLanguageOption = searchInput.value
 
     let searchList = ''
 
@@ -359,8 +313,8 @@ export default async function getQuestion() {
 
     const queryText = searchPrompt({
       query: searchInput.value,
-      results: getSummaryPrompt(searchList, providerConfigs.provider),
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      results: getSummaryPrompt(searchList),
+      language: language,
       prompt: Instructions,
     })
 
@@ -374,10 +328,7 @@ export default async function getQuestion() {
   const searchInput = getPossibleElementByQuerySelector<HTMLInputElement>(siteConfig.inputQuery)
 
   if (searchInput && searchInput.value) {
-    const searchValueWithLanguageOption =
-      userConfig.language === Language.Auto
-        ? searchInput.value
-        : `${searchInput.value}(in ${userConfig.language})`
+    const searchValueWithLanguageOption = searchInput.value
 
     let searchList = ''
 
@@ -432,8 +383,8 @@ export default async function getQuestion() {
 
     const queryText = searchPrompt({
       query: searchInput.value,
-      results: getSummaryPrompt(searchList, providerConfigs.provider),
-      language: userConfig.language === Language.Auto ? language : userConfig.language,
+      results: getSummaryPrompt(searchList),
+      language: language,
       prompt: Instructions,
     })
 

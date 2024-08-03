@@ -1,17 +1,16 @@
-import { useEffect, useState, useCallback, useRef } from 'preact/hooks'
-import classNames from 'classnames'
-import { memo, useMemo } from 'react'
+import { BASE_URL, getUserConfig } from '@/config'
+import { isBraveBrowser, shouldShowRatingTip } from '@/content-script/utils'
+import { Answer } from '@/messaging'
+import { isIOS, isSafari } from '@/utils/utils'
 import { Loading } from '@geist-ui/core'
+import classNames from 'classnames'
+import { debounce } from 'lodash-es'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
+import { memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import Browser from 'webextension-polyfill'
-import { Answer } from '@/messaging'
 import ChatGPTFeedback from './ChatGPTFeedback'
-import { debounce } from 'lodash-es'
-import { isBraveBrowser, shouldShowRatingTip } from '@/content-script/utils'
-import { BASE_URL } from '@/config'
-import { isIOS, isSafari } from '@/utils/utils'
-import { getUserConfig } from '@/config'
 
 import '@/content-script/styles.scss'
 
@@ -53,6 +52,7 @@ function ChatGPTQuery(props: Props) {
           setAnswer({ ...msg, ...{ text } })
           setStatus('success')
         } else if (msg.error) {
+          console.log(msg)
           setError(msg.error)
           setStatus('error')
         } else if (msg.event === 'DONE') {
@@ -141,7 +141,7 @@ function ChatGPTQuery(props: Props) {
             {answer.text}
           </ReactMarkdown>
         </div>
-        {(continueConversation && answer.conversationId && done) && (
+        {continueConversation && answer.conversationId && done && (
           <div>
             <a href={`https://chat.openai.com/c/${answer.conversationId}`} target="_blank">
               Continue conversation

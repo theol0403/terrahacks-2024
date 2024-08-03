@@ -138,37 +138,14 @@
 .glarity--m-0 {
   margin: 0px;
 }
-.glarity--mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.glarity--my-1 {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-}
-.glarity--mb-0 {
-  margin-bottom: 0px;
-}
 .glarity--mb-1 {
   margin-bottom: 0.25rem;
 }
 .glarity--ml-1 {
   margin-left: 0.25rem;
 }
-.glarity--mt-0 {
-  margin-top: 0px;
-}
-.glarity--mt-14 {
-  margin-top: 3.5rem;
-}
 .glarity--mt-2 {
   margin-top: 0.5rem;
-}
-.glarity--mt-5 {
-  margin-top: 1.25rem;
-}
-.glarity--mt-8 {
-  margin-top: 2rem;
 }
 .glarity--block {
   display: block;
@@ -176,23 +153,14 @@
 .glarity--flex {
   display: flex;
 }
-.glarity--h-10 {
-  height: 2.5rem;
-}
 .glarity--h-5 {
   height: 1.25rem;
 }
 .glarity--h-full {
   height: 100%;
 }
-.glarity--w-10 {
-  width: 2.5rem;
-}
 .glarity--w-5 {
   width: 1.25rem;
-}
-.glarity--w-\[900px\] {
-  width: 900px;
 }
 .glarity--cursor-pointer {
   cursor: pointer;
@@ -206,26 +174,8 @@
 .glarity--items-center {
   align-items: center;
 }
-.glarity--justify-between {
-  justify-content: space-between;
-}
-.glarity--gap-1 {
-  gap: 0.25rem;
-}
-.glarity--gap-2 {
-  gap: 0.5rem;
-}
-.glarity--gap-3 {
-  gap: 0.75rem;
-}
-.glarity--gap-4 {
-  gap: 1rem;
-}
 .glarity--break-all {
   word-break: break-all;
-}
-.glarity--rounded-lg {
-  border-radius: 0.5rem;
 }
 .glarity--rounded-sm {
   border-radius: 0.125rem;
@@ -233,10 +183,6 @@
 .glarity--px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-}
-.glarity--px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 .glarity--text-sm {
   font-size: 0.875rem;

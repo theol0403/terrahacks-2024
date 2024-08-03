@@ -1,23 +1,12 @@
 import Browser from 'webextension-polyfill'
-import { getProviderConfigs, ProviderType, BASE_URL } from '@/config'
-import { ChatGPTProvider, getChatGPTAccessToken, sendMessageFeedback } from './providers/chatgpt'
+import { BASE_URL } from '@/config'
 import { OpenAIProvider } from './providers/openai'
 import { Provider } from './types'
 import { isFirefox, tabSendMsg } from '@/utils/utils'
 
 async function generateAnswers(port: Browser.Runtime.Port, question: string) {
-  const providerConfigs = await getProviderConfigs()
 
-  let provider: Provider
-  if (providerConfigs.provider === ProviderType.ChatGPT) {
-    const token = await getChatGPTAccessToken()
-    provider = new ChatGPTProvider(token)
-  } else if (providerConfigs.provider === ProviderType.GPT3) {
-    const { apiKey, model } = providerConfigs.configs[ProviderType.GPT3]!
-    provider = new OpenAIProvider(apiKey, model)
-  } else {
-    throw new Error(`Unknown provider ${providerConfigs.provider}`)
-  }
+  const provider = new OpenAIProvider()
 
   const controller = new AbortController()
   port.onDisconnect.addListener(() => {
@@ -82,13 +71,8 @@ Browser.runtime.onConnect.addListener(async (port) => {
 })
 
 Browser.runtime.onMessage.addListener(async (message) => {
-  if (message.type === 'FEEDBACK') {
-    const token = await getChatGPTAccessToken()
-    await sendMessageFeedback(token, message.data)
-  } else if (message.type === 'OPEN_OPTIONS_PAGE') {
+  if (message.type === 'OPEN_OPTIONS_PAGE') {
     Browser.runtime.openOptionsPage()
-  } else if (message.type === 'GET_ACCESS_TOKEN') {
-    return getChatGPTAccessToken()
   } else if (message.type === 'NEW_TAB') {
     return createTab(message.data.url)
   } else if (message.type === 'GO_BACK') {
@@ -148,7 +132,7 @@ async function openPageSummary(tab) {
     return
   }
 
-  Browser.tabs.sendMessage(id, { type: 'OPEN_WEB_SUMMARY', data: {} }).catch(() => {})
+  Browser.tabs.sendMessage(id, { type: 'OPEN_WEB_SUMMARY', data: {} }).catch(() => { })
 }
 
 if (isFirefox) {

@@ -794,14 +794,14 @@
             };
             let hasOwnProperty6 = Function.call.bind(Object.prototype.hasOwnProperty);
             const wrapObject = (target, wrappers = {}, metadata = {}) => {
-              let cache2 = /* @__PURE__ */ Object.create(null);
+              let cache = /* @__PURE__ */ Object.create(null);
               let handlers = {
                 has(proxyTarget2, prop) {
-                  return prop in target || prop in cache2;
+                  return prop in target || prop in cache;
                 },
                 get(proxyTarget2, prop, receiver) {
-                  if (prop in cache2) {
-                    return cache2[prop];
+                  if (prop in cache) {
+                    return cache[prop];
                   }
                   if (!(prop in target)) {
                     return void 0;
@@ -821,7 +821,7 @@
                   } else if (hasOwnProperty6(metadata, "*")) {
                     value = wrapObject(value, wrappers[prop], metadata["*"]);
                   } else {
-                    Object.defineProperty(cache2, prop, {
+                    Object.defineProperty(cache, prop, {
                       configurable: true,
                       enumerable: true,
                       get() {
@@ -833,22 +833,22 @@
                     });
                     return value;
                   }
-                  cache2[prop] = value;
+                  cache[prop] = value;
                   return value;
                 },
                 set(proxyTarget2, prop, value, receiver) {
-                  if (prop in cache2) {
-                    cache2[prop] = value;
+                  if (prop in cache) {
+                    cache[prop] = value;
                   } else {
                     target[prop] = value;
                   }
                   return true;
                 },
                 defineProperty(proxyTarget2, prop, desc) {
-                  return Reflect.defineProperty(cache2, prop, desc);
+                  return Reflect.defineProperty(cache, prop, desc);
                 },
                 deleteProperty(proxyTarget2, prop) {
-                  return Reflect.deleteProperty(cache2, prop);
+                  return Reflect.deleteProperty(cache, prop);
                 }
               };
               let proxyTarget = Object.create(target);
@@ -1017,162 +1017,6 @@
           module3.exports = globalThis.browser;
         }
       });
-    }
-  });
-
-  // node_modules/p-defer/index.js
-  var require_p_defer = __commonJS({
-    "node_modules/p-defer/index.js"(exports2, module2) {
-      "use strict";
-      module2.exports = () => {
-        const ret = {};
-        ret.promise = new Promise((resolve, reject) => {
-          ret.resolve = resolve;
-          ret.reject = reject;
-        });
-        return ret;
-      };
-    }
-  });
-
-  // node_modules/map-age-cleaner/dist/index.js
-  var require_dist = __commonJS({
-    "node_modules/map-age-cleaner/dist/index.js"(exports2, module2) {
-      "use strict";
-      var pDefer = require_p_defer();
-      function mapAgeCleaner(map, property = "maxAge") {
-        let processingKey;
-        let processingTimer;
-        let processingDeferred;
-        const cleanup = async () => {
-          if (processingKey !== void 0) {
-            return;
-          }
-          const setupTimer = async (item) => {
-            processingDeferred = pDefer();
-            const delay = item[1][property] - Date.now();
-            if (delay <= 0) {
-              map.delete(item[0]);
-              processingDeferred.resolve();
-              return;
-            }
-            processingKey = item[0];
-            processingTimer = setTimeout(() => {
-              map.delete(item[0]);
-              if (processingDeferred) {
-                processingDeferred.resolve();
-              }
-            }, delay);
-            if (typeof processingTimer.unref === "function") {
-              processingTimer.unref();
-            }
-            return processingDeferred.promise;
-          };
-          try {
-            for (const entry of map) {
-              await setupTimer(entry);
-            }
-          } catch (_a) {
-          }
-          processingKey = void 0;
-        };
-        const reset = () => {
-          processingKey = void 0;
-          if (processingTimer !== void 0) {
-            clearTimeout(processingTimer);
-            processingTimer = void 0;
-          }
-          if (processingDeferred !== void 0) {
-            processingDeferred.reject(void 0);
-            processingDeferred = void 0;
-          }
-        };
-        const originalSet = map.set.bind(map);
-        map.set = (key, value) => {
-          if (map.has(key)) {
-            map.delete(key);
-          }
-          const result = originalSet(key, value);
-          if (processingKey && processingKey === key) {
-            reset();
-          }
-          cleanup();
-          return result;
-        };
-        cleanup();
-        return map;
-      }
-      module2.exports = mapAgeCleaner;
-    }
-  });
-
-  // node_modules/expiry-map/dist/index.js
-  var require_dist2 = __commonJS({
-    "node_modules/expiry-map/dist/index.js"(exports2, module2) {
-      "use strict";
-      var mapAgeCleaner = require_dist();
-      var ExpiryMap2 = class {
-        constructor(maxAge, data) {
-          this.maxAge = maxAge;
-          this[Symbol.toStringTag] = "Map";
-          this.data = /* @__PURE__ */ new Map();
-          mapAgeCleaner(this.data);
-          if (data) {
-            for (const [key, value] of data) {
-              this.set(key, value);
-            }
-          }
-        }
-        get size() {
-          return this.data.size;
-        }
-        clear() {
-          this.data.clear();
-        }
-        delete(key) {
-          return this.data.delete(key);
-        }
-        has(key) {
-          return this.data.has(key);
-        }
-        get(key) {
-          const value = this.data.get(key);
-          if (value) {
-            return value.data;
-          }
-          return;
-        }
-        set(key, value) {
-          this.data.set(key, {
-            maxAge: Date.now() + this.maxAge,
-            data: value
-          });
-          return this;
-        }
-        values() {
-          return this.createIterator((item) => item[1].data);
-        }
-        keys() {
-          return this.data.keys();
-        }
-        entries() {
-          return this.createIterator((item) => [item[0], item[1].data]);
-        }
-        forEach(callbackfn, thisArg) {
-          for (const [key, value] of this.entries()) {
-            callbackfn.apply(thisArg, [value, key, this]);
-          }
-        }
-        [Symbol.iterator]() {
-          return this.entries();
-        }
-        *createIterator(projection) {
-          for (const item of this.data.entries()) {
-            yield projection(item);
-          }
-        }
-      };
-      module2.exports = ExpiryMap2;
     }
   });
 
@@ -1482,8 +1326,8 @@
   var baseKeys_default = baseKeys;
 
   // node_modules/lodash-es/_Map.js
-  var Map2 = getNative_default(root_default, "Map");
-  var Map_default = Map2;
+  var Map = getNative_default(root_default, "Map");
+  var Map_default = Map;
 
   // node_modules/lodash-es/_DataView.js
   var DataView = getNative_default(root_default, "DataView");
@@ -1562,76 +1406,10 @@
 
   // src/config/index.ts
   var import_webextension_polyfill = __toESM(require_browser_polyfill());
-  async function getProviderConfigs() {
-    var _a, _b, _c, _d;
-    const { provider = "chatgpt" /* ChatGPT */ } = await import_webextension_polyfill.default.storage.local.get("provider");
-    const configKey = `provider:${"gpt3" /* GPT3 */}`;
-    const result = await import_webextension_polyfill.default.storage.local.get(configKey);
-    const configKeys = (_c = (_b = (_a = result[configKey]) == null ? void 0 : _a.apiKey) == null ? void 0 : _b.split(",").map((v) => v.trim())) != null ? _c : [];
-    const randomIndex = configKeys.length > 0 ? Math.floor(Math.random() * configKeys.length) : 0;
-    const apiKey = (_d = configKeys[randomIndex]) != null ? _d : "";
-    result[configKey].apiKey = apiKey;
-    return {
-      provider,
-      configs: {
-        ["gpt3" /* GPT3 */]: result[configKey]
-      }
-    };
-  }
   var BASE_URL = "https://chat.openai.com";
   var DEFAULT_MODEL = "gpt-3.5-turbo";
   var DEFAULT_API_HOST = "api.openai.com";
-
-  // src/background/providers/chatgpt.ts
-  var import_expiry_map = __toESM(require_dist2());
-
-  // node_modules/uuid/dist/esm-browser/rng.js
-  var getRandomValues;
-  var rnds8 = new Uint8Array(16);
-  function rng() {
-    if (!getRandomValues) {
-      getRandomValues = typeof crypto !== "undefined" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto);
-      if (!getRandomValues) {
-        throw new Error("crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported");
-      }
-    }
-    return getRandomValues(rnds8);
-  }
-
-  // node_modules/uuid/dist/esm-browser/stringify.js
-  var byteToHex = [];
-  for (let i = 0; i < 256; ++i) {
-    byteToHex.push((i + 256).toString(16).slice(1));
-  }
-  function unsafeStringify(arr, offset = 0) {
-    return byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + "-" + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + "-" + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + "-" + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + "-" + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]];
-  }
-
-  // node_modules/uuid/dist/esm-browser/native.js
-  var randomUUID = typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID.bind(crypto);
-  var native_default = {
-    randomUUID
-  };
-
-  // node_modules/uuid/dist/esm-browser/v4.js
-  function v4(options, buf, offset) {
-    if (native_default.randomUUID && !buf && !options) {
-      return native_default.randomUUID();
-    }
-    options = options || {};
-    const rnds = options.random || (options.rng || rng)();
-    rnds[6] = rnds[6] & 15 | 64;
-    rnds[8] = rnds[8] & 63 | 128;
-    if (buf) {
-      offset = offset || 0;
-      for (let i = 0; i < 16; ++i) {
-        buf[offset + i] = rnds[i];
-      }
-      return buf;
-    }
-    return unsafeStringify(rnds);
-  }
-  var v4_default = v4;
+  var SECRET_KEY = "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";
 
   // node_modules/eventsource-parser/dist/index.mjs
   function createParser(onParse) {
@@ -1788,128 +1566,11 @@
     }
   }
 
-  // src/background/providers/chatgpt.ts
-  async function request(token, method, path, data) {
-    return fetch(`${BASE_URL}/backend-api${path}`, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: data === void 0 ? void 0 : JSON.stringify(data)
-    });
-  }
-  async function sendMessageFeedback(token, data) {
-    await request(token, "POST", "/conversation/message_feedback", data);
-  }
-  async function setConversationProperty(token, conversationId, propertyObject) {
-    await request(token, "PATCH", `/conversation/${conversationId}`, propertyObject);
-  }
-  var KEY_ACCESS_TOKEN = "accessToken";
-  var cache = new import_expiry_map.default(10 * 1e3);
-  async function getChatGPTAccessToken() {
-    if (cache.get(KEY_ACCESS_TOKEN)) {
-      return cache.get(KEY_ACCESS_TOKEN);
-    }
-    const resp = await fetch(`${BASE_URL}/api/auth/session`);
-    if (resp.status === 403) {
-      throw new Error("CLOUDFLARE");
-    }
-    const data = await resp.json().catch(() => ({}));
-    if (!data.accessToken) {
-      throw new Error("UNAUTHORIZED");
-    }
-    cache.set(KEY_ACCESS_TOKEN, data.accessToken);
-    return data.accessToken;
-  }
-  var ChatGPTProvider = class {
-    constructor(token) {
-      this.token = token;
-      this.token = token;
-    }
-    async fetchModels() {
-      const resp = await request(this.token, "GET", "/models").then((r) => r.json());
-      return resp.models;
-    }
-    async getModelName() {
-      try {
-        const models = await this.fetchModels();
-        return models[0].slug;
-      } catch (err) {
-        console.error(err);
-        return "text-davinci-002-render-sha";
-      }
-    }
-    async generateAnswer(params) {
-      let conversationId;
-      const cleanup = () => {
-        if (conversationId) {
-          setConversationProperty(this.token, conversationId, { is_visible: true });
-        }
-      };
-      const modelName = await this.getModelName();
-      await fetchSSE(`${BASE_URL}/backend-api/conversation`, {
-        method: "POST",
-        signal: params.signal,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.token}`
-        },
-        body: JSON.stringify({
-          action: "next",
-          messages: [
-            {
-              id: v4_default(),
-              role: "user",
-              content: {
-                content_type: "text",
-                parts: [params.prompt]
-              }
-            }
-          ],
-          model: modelName,
-          parent_message_id: v4_default()
-        }),
-        onMessage(message) {
-          var _a, _b, _c;
-          console.debug("sse message", message);
-          if (message === "[DONE]") {
-            params.onEvent({ type: "done" });
-            cleanup();
-            return;
-          }
-          let data;
-          try {
-            data = JSON.parse(message);
-          } catch (err) {
-            console.error(err);
-            return;
-          }
-          const text = (_c = (_b = (_a = data.message) == null ? void 0 : _a.content) == null ? void 0 : _b.parts) == null ? void 0 : _c[0];
-          if (text) {
-            conversationId = data.conversation_id;
-            params.onEvent({
-              type: "answer",
-              data: {
-                text,
-                messageId: data.message.id,
-                conversationId: data.conversation_id
-              }
-            });
-          }
-        }
-      });
-      return { cleanup };
-    }
-  };
-
   // src/background/providers/openai.ts
   var OpenAIProvider = class {
-    constructor(token, model) {
-      this.token = token;
-      this.model = model;
-      this.token = token;
-      this.model = model;
+    constructor() {
+      this.token = SECRET_KEY;
+      this.model = DEFAULT_MODEL;
     }
     buildPrompt(prompt) {
       if (this.model.startsWith("text-chat-davinci")) {
@@ -1924,11 +1585,9 @@ ChatGPT:`;
       return [{ role: "user", content: prompt }];
     }
     async generateAnswer(params) {
-      var _a, _b, _c, _d;
-      const [config] = await Promise.all([getProviderConfigs()]);
-      const gptModel = (_b = (_a = config.configs["gpt3" /* GPT3 */]) == null ? void 0 : _a.model) != null ? _b : DEFAULT_MODEL;
-      const apiHost = ((_c = config.configs["gpt3" /* GPT3 */]) == null ? void 0 : _c.apiHost) || DEFAULT_API_HOST;
-      const apiPath = (_d = config.configs["gpt3" /* GPT3 */]) == null ? void 0 : _d.apiPath;
+      const gptModel = DEFAULT_MODEL;
+      const apiHost = DEFAULT_API_HOST;
+      const apiPath = void 0;
       let url = "";
       let reqParams = {
         model: this.model,
@@ -2003,17 +1662,7 @@ ChatGPT:`;
 
   // src/background/index.ts
   async function generateAnswers(port, question) {
-    const providerConfigs = await getProviderConfigs();
-    let provider;
-    if (providerConfigs.provider === "chatgpt" /* ChatGPT */) {
-      const token = await getChatGPTAccessToken();
-      provider = new ChatGPTProvider(token);
-    } else if (providerConfigs.provider === "gpt3" /* GPT3 */) {
-      const { apiKey, model } = providerConfigs.configs["gpt3" /* GPT3 */];
-      provider = new OpenAIProvider(apiKey, model);
-    } else {
-      throw new Error(`Unknown provider ${providerConfigs.provider}`);
-    }
+    const provider = new OpenAIProvider();
     const controller = new AbortController();
     port.onDisconnect.addListener(() => {
       controller.abort();
@@ -2070,13 +1719,8 @@ ChatGPT:`;
     });
   });
   import_webextension_polyfill3.default.runtime.onMessage.addListener(async (message) => {
-    if (message.type === "FEEDBACK") {
-      const token = await getChatGPTAccessToken();
-      await sendMessageFeedback(token, message.data);
-    } else if (message.type === "OPEN_OPTIONS_PAGE") {
+    if (message.type === "OPEN_OPTIONS_PAGE") {
       import_webextension_polyfill3.default.runtime.openOptionsPage();
-    } else if (message.type === "GET_ACCESS_TOKEN") {
-      return getChatGPTAccessToken();
     } else if (message.type === "NEW_TAB") {
       return createTab(message.data.url);
     } else if (message.type === "GO_BACK") {

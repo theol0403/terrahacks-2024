@@ -1,6 +1,5 @@
 import { waitForElm } from './utils'
 import { queryParam } from 'gb-url'
-import { getBiliVideoId } from '../utils/bilibili'
 export interface SearchEngine {
   inputQuery: string[]
   sidebarContainerQuery: string[]
@@ -225,36 +224,6 @@ export const config: Record<string, SearchEngine> = {
         if (window.location.href !== currentUrl) {
           if (/patents.google.com\/patent\/\w+/g.test(location.href)) {
             waitForElm(config.googlePatents.extabarContainerQuery?.[0]).then(() => {
-              if (document.querySelector('section.glarity--container')) {
-                document.querySelector('section.glarity--container')?.remove()
-              }
-            })
-
-            callback()
-          }
-
-          currentUrl = window.location.href
-        }
-      }, 1000)
-    },
-  },
-  bilibili: {
-    inputQuery: [],
-    sidebarContainerQuery: [],
-    appendContainerQuery: [],
-    extabarContainerQuery: ['div.bpx-player-auxiliary'],
-    contentContainerQuery: [],
-    name: 'bilibili',
-    siteName: 'Bilibili',
-    siteValue: 'bilibili',
-    regex: '(^(www.)?bilibili.com)',
-    watchRouteChange(callback) {
-      let currentUrl = window.location.href
-
-      setInterval(() => {
-        if (window.location.href !== currentUrl) {
-          if (getBiliVideoId(location.href)) {
-            waitForElm(config.bilibili.extabarContainerQuery?.[0]).then(() => {
               if (document.querySelector('section.glarity--container')) {
                 document.querySelector('section.glarity--container')?.remove()
               }

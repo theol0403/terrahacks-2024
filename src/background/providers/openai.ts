@@ -1,12 +1,10 @@
 import { fetchSSE } from '../fetch-sse'
 import { GenerateAnswerParams, Provider } from '../types'
-import { getProviderConfigs, ProviderType, DEFAULT_MODEL, DEFAULT_API_HOST } from '@/config'
+import { DEFAULT_MODEL, DEFAULT_API_HOST, SECRET_KEY } from '@/config'
 
 export class OpenAIProvider implements Provider {
-  constructor(private token: string, private model: string) {
-    this.token = token
-    this.model = model
-  }
+  token = SECRET_KEY
+  model = DEFAULT_MODEL
 
   private buildPrompt(prompt: string): string {
     if (this.model.startsWith('text-chat-davinci')) {
@@ -20,11 +18,9 @@ export class OpenAIProvider implements Provider {
   }
 
   async generateAnswer(params: GenerateAnswerParams) {
-    const [config] = await Promise.all([getProviderConfigs()])
-
-    const gptModel = config.configs[ProviderType.GPT3]?.model ?? DEFAULT_MODEL
-    const apiHost = config.configs[ProviderType.GPT3]?.apiHost || DEFAULT_API_HOST
-    const apiPath = config.configs[ProviderType.GPT3]?.apiPath
+    const gptModel = DEFAULT_MODEL
+    const apiHost = DEFAULT_API_HOST
+    const apiPath = undefined
 
     let url = ''
     let reqParams = {
