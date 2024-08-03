@@ -1,29 +1,5 @@
 # Glarity - Summary for Google/YouTube with ChatGPT
 
-Glarity Summary: an open-source ChatGPT Summary extension for YouTube, Google, Twitter, and any webpage. It provides cross-language summaries to effortlessly summarize videos, searches, PDFs, emails, and webpages. It supports free side-by-side translations, email writing assistance, Web Content Q&A, and much more
-Download the experience package ([https://github.com/sparticleinc/chatgpt-google-summary-extension/tree/main/packages](https://github.com/sparticleinc/chatgpt-google-summary-extension/tree/main/packages)) and adding it manually ([https://github.com/sparticleinc/chatgpt-google-summary-extension#chrome](https://github.com/sparticleinc/chatgpt-google-summary-extension#chrome)).
-
-## Supported Websites
-
-- Google
-- YouTube
-- Yahoo! JAPAN ニュース
-- PubMed
-- PMC
-- NewsPicks
-- Github
-- Nikkei
-- Bing
-- Google Patents
-- Bilibili
-- Any website
-  (summary list:https://blog.glarity.app/getting-started/user-guide/summary-list)
-
-## Installation
-
-[Add from Chrome Web Store](https://chrome.google.com/webstore/detail/summary-for-google-with-c/cmnlolelipjlhfkhpohphpedmkfbobjc)
-[Add from Mozilla Add-on Store](https://addons.mozilla.org/zh-CN/firefox/addon/glarity/)
-
 ## Features
 
 - Side-by-Side Translation (mirror translation, immersive translate)
@@ -52,75 +28,11 @@ Download the experience package ([https://github.com/sparticleinc/chatgpt-google
 - Switch languages
 - Glarity AI model
 
-## Screenshot
-
-### Google
-
-![Screenshot](screenshots/google-vs-chatgpt.png?raw=true)
-![Screenshot](screenshots/extension-google.png?raw=true)
-
-### YouTube
-
-![Screenshot](screenshots/extension-youtube.jpeg?raw=true)
-
-### Bilibili
-
-![Screenshot](screenshots/bilibili-cn.webp?raw=true)
-
-### iOS Safari /macOS Safari
-
-![Screenshot](screenshots/iOS-Safari-en.webp?raw=true)
-![Screenshot](screenshots/macOS-Safari-en.webp?raw=true)
-
-### Github
-
-![Github](screenshots/github-en.png?raw=true)
-
-### Bing
-
-![Bing](screenshots/bing-en.png)
-
-### Google Patents
-
-![Google Patents](screenshots/google-patents-en.png)
-
-### Yahoo! JAPAN ニュース
-
-![Screenshot](screenshots/yahoo-japan.jpg?raw=true)
-
-### PubMed
-
-![Screenshot](screenshots/pubmed.jpg?raw=true)
-
-### PMC
-
-![Screenshot](screenshots/PMC-en.png?raw=true)
-
-### NewsPicks
-
-![Screenshot](screenshots/newspicks-jp.jpg?raw=true)
-
-### Nikkei
-
-![Nikkei](screenshots/nikkei-jp.png)
-
-## Troubleshooting
-
-### How to make it work in Brave
-
-![Screenshot](screenshots/brave.png?raw=true)
-Disable "Prevent sites from fingerprinting me based on my language preferences" in `brave://settings/shields`
-
 ## Build from source
 
 1. Clone the repo
 2. Install dependencies with `npm`
 3. `npm run build`
-
-### Packages
-
-- [Chromium](packages/Glarity-chromium-beta.zip)
-- [Firefox](packages/Glarity-firefox-beta.zip)
 
 ### Chrome
 
@@ -134,10 +46,6 @@ Disable "Prevent sites from fingerprinting me based on my language preferences" 
 1. Go to `about:debugging#/runtime/this-firefox`.
 2. Click `Load Temporary Add-on`.
 3. Find and select the extension file(`build/firefox.zip`).
-
-## Credit
-
-This project is a fork of [wong2/chatgpt-google-extension](https://github.com/wong2/chatgpt-google-extension), and borrows code from [qunash/chatgpt-advanced](https://github.com/qunash/chatgpt-advanced) & [YouTube Summary with ChatGPT](https://github.com/kazuki-sf/YouTube_Summary_with_ChatGPT)
 
 ## License
 
