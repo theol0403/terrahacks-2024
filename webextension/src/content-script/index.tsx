@@ -1,5 +1,5 @@
 import { getUserConfig } from '@/config'
-import PageSummary from '@/content-script/compenents/PageSummary'
+import PageSummary from '@/content-script/components/PageSummary'
 import '@/content-script/styles.scss'
 import { render } from 'preact'
 

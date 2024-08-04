@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% endblock %}
+
+{% block script %}
+<script>
+  var animal = JSON.parse('{{ animal|tojson }}');
+  var animalProperties = JSON.parse('{{ animalProperties|tojson }}');
+  var animalAbilities = JSON.parse('{{ animalAbilities|tojson }}');
+  var animalStats = JSON.parse('{{ animalStats|tojson }}');
+  var environment = JSON.parse('{{ environment|tojson }}');
+
+  console.log(animal);
+  console.log(animalProperties);
+  console.log(animalAbilities);
+  console.log(animalStats);
+  console.log(environment);
+</script>
+{% endblock %}
+
+{% block content %}
+  <div class="container" id="battle-game">
+    <div class="subcontainer" id="menu-main">
+      <button type="button" class="btn btn-dark" style="grid-area: fight; font-weight: bolder;" onclick="useMenuOption(this);">Fight!</button>
+      <button type="button" class="btn btn-warning" style="grid-area: items;" onclick="useMenuOption(this);">Items</button>
+      <button type="button" class="btn btn-secondary" style="grid-area: help;" onclick="useMenuOption(this);">Help</button>
+      <button type="button" class="btn btn-secondary" style="grid-area: escape;" onclick="exitGame();">Escape</button>
+    </div>
+    <div class="subcontainer" id="menu-action">
+      <button type="button" class="btn btn-secondary" style="grid-area: action1;" onclick="useAbility(1);" onmouseenter="showAbilityDescription(1);" onmouseleave="hideAbilityDescription()">NONE</button>
+      <button type="button" class="btn btn-secondary" style="grid-area: action2;" onclick="useAbility(2);" onmouseenter="showAbilityDescription(2);" onmouseleave="hideAbilityDescription()">NONE</button>
+      <button type="button" class="btn btn-secondary" style="grid-area: action3;" onclick="useAbility(3);" onmouseenter="showAbilityDescription(3);" onmouseleave="hideAbilityDescription()">NONE</button>
+      <button type="button" class="btn btn-secondary" style="grid-area: action4;" onclick="useAbility(4);" onmouseenter="showAbilityDescription(4);" onmouseleave="hideAbilityDescription()">NONE</button>
+      <button type="button" class="btn btn-dark" style="grid-area: return;" id="action-return" onclick="useMenuOption(this);">Return</button>
+    </div>
+    <div class="subcontainer" id="menu-item">
+      <!-- None for now -->
+    </div>
+    <div class="subcontainer" id="healthbar-friendly">
+      <div class="healthbar-icon" id="healthbar-friendly-icon" style="grid-area: icon;"></div>
+      <div class="healthbar-bars" style="grid-area: bar;">
+        <div class="healthbar-health progress w-100 h-100" style="grid-area: health;">
+          <div class="progress-bar bg-success h-100" id="healthbar-friendly-health" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100 / 100 HP</div>
+        </div>
+        <div class="healthbar-time progress w-100 h-100" style="grid-area: time;">
+          <div class="progress-bar progress-bar-striped bg-info h-100 text-dark" id="healthbar-friendly-time" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="60">60 seconds</div>
+        </div>
+      </div>
+    </div>
+    <div class="subcontainer" id="healthbar-enemy">
+      <div class="healthbar-icon" id="healthbar-enemy-icon" style="grid-area: icon;"></div>
+      <div class="healthbar-bars" style="grid-area: bar;">
+        <div class="healthbar-health progress w-100 h-100" style="grid-area: health;">
+          <div class="progress-bar bg-danger h-100" id="healthbar-enemy-health" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100 / 100 HP</div>
+        </div>
+        <div class="healthbar-time progress w-100 h-100" style="grid-area: time;">
+          <div class="progress-bar progress-bar-striped bg-secondary w-100 h-100" id="healthbar-enemy-time" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="60">? seconds</div>
+        </div>
+      </div>
+    </div>
+    <div class="subcontainer" id="narrator">
+
+    </div>
+    <div class="subcontainer" id="logs">
+      
+    </div>
+
+    <div class="background" id="default-game-background"></div>
+    <div class="animal-base" id="animal-base-friendly"></div>
+    <div class="animal-base" id="animal-base-enemy"></div>
+    <div class="animal-sprite" id="animal-sprite-friendly"></div>
+    <div class="animal-sprite" id="animal-sprite-enemy"></div>
+
+    <div class="animal-name" id="animal-name-friendly"><strong style="cursor: pointer;" title="The dodo bird was a flightless bird native to the island of Mauritius in the Indian Ocean, standing about 3 feet tall with a large beak and a plump body. It became extinct in the late 17th century due to overhunting by sailors and the introduction of non-native animals that preyed on its eggs and habitat.">DIDI BIRD </strong>(Level 5)</div>
+    <div class="animal-name" id="animal-name-enemy"><strong style="cursor: pointer;" title={{ description }}>{{ animal }} </strong>(Level ?)</div>
+
+    <div class="description-box bg-light" id="description-box-ability">
+      <strong>ABILITY NAME</strong>
+      <p>Ability description.</p>
+    </div>
+
+    <div id="hit-animation"></div>
+    <div id="damage-indicator">-50 HP</div>
+    <div id="crit-indicator">CRITICAL!</div>
+  </div>
+
+  <div id="intro">
+    <div id="intro-bg"></div>
+    <div id="intro-content">
+      <h1>BATTLE PREMISES</h1>
+      <p>{{ description }}</p>
+      <br />
+      <div id="intro-abilities">
+        <h2 style="color: white;">Abilities</h2>
+      </div>
+      <button class="btn btn-light" onclick="startGame();">Start Battle!</button>
+      <button class="btn btn-secondary" onclick="exitGame();">Escape</button>
+    </div>
+  </div>
+
+  <div id="outro">
+    <div id="outro-bg"></div>
+    <div id="outro-content">
+      <div id="outro-pic"></div>
+      <br />
+      <button class="btn btn-success" id="outro-btn" onclick="exitGame();">Exit Battle</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('outro').style.display = 'none';">Return to Aftermath</button>
+    </div>
+  </div>
+{% endblock %}
