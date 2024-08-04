@@ -1,16 +1,17 @@
 .dodo-bird {
   position: fixed;
   z-index: 99999999999999;
-  transition: none; /* Remove transition for dragging */
+  transition: all 2s ease-in-out; 
 }
 
-.dodo-bird.dodo-bird--flying {
-  transition: all 1s ease-in-out; /* Add transition only when flying */
+
+.dodo-bird.dodo-bird--dragging {
+  transition: none;
 }
 
 .dodo-bird img {
-  width: 100px;
-  height: auto;
+  height: 140px;
+  width: auto;
 }
 
 .dodo-bird--flying img {
@@ -55,4 +56,28 @@
   margin: 0;
   font-size: 14px;
   color: black;
+}
+
+.open-new-tab-button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  font-size: 16px;
+  margin: 4px auto;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 1s ease-in-out; 
+  opacity: 0;
+}
+
+.open-new-tab-button.show {
+  opacity: 1;
+}
+
+.open-new-tab-button:hover {
+  background-color: #45a049;
 }

@@ -1,5 +1,4 @@
 import { Answer } from '@/messaging'
-import { Loading } from '@geist-ui/core'
 import classNames from 'classnames'
 import { debounce } from 'lodash-es'
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
@@ -156,7 +155,7 @@ function ChatGPTQuery(props: Props) {
     )
   }
 
-  return <Loading />
+  return <></>
 }
 
 export default memo(ChatGPTQuery)
