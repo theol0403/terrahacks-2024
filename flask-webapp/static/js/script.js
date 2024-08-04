@@ -278,11 +278,11 @@ function activateAI() {
         document.getElementById("hit-animation").style.display = "none";
   
         // Check crit
-        var critChance = Math.min(Math.ceil((currAbility.crit + enemyCritBonus) * 100), 100);
+        var critChance = Math.min(Math.ceil((currAbility.crit) * 100), 100);
         var critDamage = 0;
         var critHit = false;
         if (Math.random() * 100 + 1 <= critChance) {
-          critDamage = currAbility.damage * Math.max(enemyCritMultiplier - 1, 0);
+          critDamage = currAbility.damage * Math.max(enemyCritMultiplier - 1, 0) + enemyCritBonus;
           critHit = true;
           newLog("enemy", String(animal) + " rolled CRITICAL DAMAGE!");
   
@@ -352,11 +352,11 @@ function activateAI() {
         document.getElementById("hit-animation").style.display = "none";
   
         // Check crit
-        var critChance = Math.min(Math.ceil((currAbility.crit + enemyCritBonus) * 100), 100);
+        var critChance = Math.min(Math.ceil((currAbility.crit) * 100), 100);
         var critDamage = 0;
         var critHit = false;
         if (Math.random() * 100 + 1 <= critChance) {
-          critDamage = currAbility.damage * Math.max(enemyCritMultiplier - 1, 0) * enemyDefenseMultiplier;
+          critDamage = currAbility.damage * Math.max(enemyCritMultiplier - 1, 0) * defenseMultiplier + enemyCritBonus;
           critHit = true;
           newLog("enemy", String(animal) + " rolled CRITICAL DAMAGE!");
   
@@ -545,11 +545,11 @@ function useAbility(num) {
       document.getElementById("hit-animation").style.display = "none";
 
       // Check crit
-      var critChance = Math.min(Math.ceil((currAbility.crit + critBonus) * 100), 100);
+      var critChance = Math.min(Math.ceil((currAbility.crit) * 100), 100);
       var critDamage = 0;
       var critHit = false;
       if (Math.random() * 100 + 1 <= critChance) {
-        critDamage = currAbility.damage * Math.max(critMultiplier - 1, 0);
+        critDamage = currAbility.damage * Math.max(critMultiplier - 1, 0) + critBonus;
         critHit = true;
         newLog("friendly", "DIDI BIRD rolled CRITICAL DAMAGE!");
 
@@ -618,11 +618,11 @@ function useAbility(num) {
       document.getElementById("hit-animation").style.display = "none";
 
       // Check crit
-      var critChance = Math.min(Math.ceil((currAbility.crit + critBonus) * 100), 100);
+      var critChance = Math.min(Math.ceil((currAbility.crit) * 100), 100);
       var critDamage = 0;
       var critHit = false;
       if (Math.random() * 100 + 1 <= critChance) {
-        critDamage = currAbility.damage * Math.max(critMultiplier - 1, 0) * enemyDefenseMultiplier;
+        critDamage = currAbility.damage * Math.max(critMultiplier - 1, 0) * enemyDefenseMultiplier + critBonus;
         critHit = true;
         newLog("friendly", "DIDI BIRD rolled CRITICAL DAMAGE!");
 
