@@ -101,7 +101,7 @@ function ChatGPTQuery(props: Props) {
         endangered_species: string
         fun_fact: string
       }
-      if (contain_endangered) {
+      if (contain_endangered && fun_fact) {
         return (
           <DodoBird animal="Dodo Bird" message={fun_fact} url="https://www.openai.com/"></DodoBird>
         )
