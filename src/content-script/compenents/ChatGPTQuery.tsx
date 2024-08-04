@@ -96,20 +96,31 @@ function ChatGPTQuery(props: Props) {
     try {
       const prompt = JSON.parse(answer.text)
       console.log('answer', prompt)
-      const { contain_endangered, endangered_species, fun_fact, garbage } = prompt as {
+      const {
+        contain_endangered,
+        endangered_species,
+        fun_fact,
+        garbage,
+        environment,
+        short_description,
+      } = prompt as {
         contain_endangered: boolean
         endangered_species: string
         fun_fact: string
         garbage: boolean
+        environment: string
+        short_description: string
       }
+
+      const url = `localhost:5000/?animal=${encodeURIComponent(
+        endangered_species,
+      )}&environment=${encodeURIComponent(
+        environment.toUpperCase(),
+      )}&description=${encodeURIComponent(short_description)}`.replace(/%20/g, '+')
+
       if (contain_endangered && fun_fact) {
         return (
-          <DodoBird
-            animal="Dodo Bird"
-            message={fun_fact}
-            url="https://www.openai.com/"
-            garbage={garbage}
-          ></DodoBird>
+          <DodoBird animal="Dodo Bird" message={fun_fact} url={url} garbage={garbage}></DodoBird>
         )
       }
     } catch (e) {
