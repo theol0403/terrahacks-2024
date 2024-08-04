@@ -1,4 +1,7 @@
+import beans from '@/assets/img/beans.png'
+import chips from '@/assets/img/chips.png'
 import standing from '@/assets/img/logo.png'
+import water from '@/assets/img/water.png'
 import '@/content-script/styles.scss'
 import classNames from 'classnames'
 import { memo, useEffect, useRef, useState } from 'react'
@@ -9,17 +12,19 @@ interface Props {
   animal: string
   message: string
   url: string
+  garbage: boolean
 }
 
 function DodoBird(props: Props) {
-  const { animal, message, url } = props
+  const { animal, message, url, garbage } = props
   const [talking, setTalking] = useState(false)
   const [flying, setFlying] = useState(true)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
+  const [pickingUpTrash, setPickingUpTrash] = useState(false)
+  const [trash, setTrash] = useState<{ id: number; x: number; y: number; src: string }[]>([])
   const dodoRef = useRef<HTMLDivElement | null>(null)
   const { displayedText: typedMessage, isComplete } = useTypingEffect(message, 30, talking)
-  // Define GIF URLs
   const defaultGif = standing
   const talkingGif =
     'https://cdn.discordapp.com/attachments/1256733655724724224/1269447662386544690/ezgif.com-animated-gif-maker.gif?ex=66b018c3&is=66aec743&hm=f239890ed228235a6eac5779efd6bc94861cfd5b67ca4baa9e5436f67c2b5faa&'
@@ -27,10 +32,13 @@ function DodoBird(props: Props) {
     'https://cdn.discordapp.com/attachments/1256733655724724224/1269449640793870446/ezgif.com-animated-gif-maker_2.gif?ex=66b01a9b&is=66aec91b&hm=200219b3793819ac3bf012db106b14b14990bb7b3ac51e044a76df6df52fcbfd&'
   const talkFlyingGif =
     'https://cdn.discordapp.com/attachments/1256733655724724224/1269449233900241129/ezgif.com-animated-gif-maker_1.gif?ex=66b01a3a&is=66aec8ba&hm=ccf20c97f1ec32e1207bf54b15981e2191a876217904d7670463de6454c12ab7&'
+  const trashGif =
+    'https://cdn.discordapp.com/attachments/1256733655724724224/1269527343907475487/Garbage_Pickup_DODO.png?ex=66b062f9&is=66af1179&hm=a4abc81b4d7efc67ed7aba3e32b7ef1581fbd4154b34fa72cc15b58454b88fe4&'
 
-  // Determine which GIF to display
   let currentGif = defaultGif
-  if (talking && (flying || isDragging)) {
+  if (pickingUpTrash) {
+    currentGif = trashGif
+  } else if (talking && (flying || isDragging)) {
     currentGif = talkFlyingGif
   } else if (talking) {
     currentGif = talkingGif
@@ -50,7 +58,6 @@ function DodoBird(props: Props) {
       })
     }
 
-    // Set initial position and add resize event listener
     updatePosition()
     setTimeout(() => {
       updatePosition()
@@ -107,33 +114,87 @@ function DodoBird(props: Props) {
     }
   }
 
+  const handleTrashClick = (id: number) => {
+    setTrash((prevTrash) => prevTrash.filter((item) => item.id !== id))
+  }
+
+  const spawnTrash = () => {
+    const windowWidth = window.innerWidth
+    const windowHeight = window.innerHeight
+    const trashImages = [beans, chips, water]
+    const trashPiece = {
+      id: Date.now(),
+      x: Math.random() * windowWidth,
+      y: Math.random() * windowHeight,
+      src: trashImages[Math.floor(Math.random() * trashImages.length)],
+    }
+    setTrash((prevTrash) => [...prevTrash, trashPiece])
+  }
+
+  useEffect(() => {
+    if (garbage) {
+      const intervalId = setInterval(spawnTrash, 6000)
+      return () => clearInterval(intervalId)
+    }
+  }, [garbage])
+
+  useEffect(() => {
+    if (trash.length > 0) {
+      const { x, y } = trash[0]
+      setPosition({ x: x - 20, y: y - 60 })
+      setFlying(true)
+      setTalking(false)
+      setTimeout(() => {
+        setPickingUpTrash(true)
+        setTimeout(() => {
+          handleTrashClick(trash[0].id)
+          setPickingUpTrash(false)
+          setFlying(false)
+        }, 500)
+      }, 1500)
+    }
+  }, [trash])
+
   return (
-    <Draggable onStart={handleStart} onStop={handleStop} position={position} disabled={flying}>
-      <div
-        ref={dodoRef}
-        className={classNames('dodo-bird', {
-          'dodo-bird--talking': talking,
-          'dodo-bird--flying': flying,
-          'dodo-bird--dragging': isDragging,
-        })}
-        onClick={handleClick}
-      >
-        <img src={currentGif} alt="Dodo Bird" />
-        {talking && (
-          <div className="speech-bubble">
-            <p>{typedMessage}</p>
-            <button
-              className={classNames('open-new-tab-button', { show: isComplete })}
-              onClick={() => {
-                window.open(url, '_blank')
-              }}
-            >
-              Play!
-            </button>
-          </div>
-        )}
-      </div>
-    </Draggable>
+    <div>
+      <Draggable onStart={handleStart} onStop={handleStop} position={position} disabled={flying}>
+        <div
+          ref={dodoRef}
+          className={classNames('dodo-bird', {
+            'dodo-bird--talking': talking,
+            'dodo-bird--flying': flying,
+            'dodo-bird--dragging': isDragging,
+            'dodo-bird--picking-up': pickingUpTrash,
+          })}
+          onClick={handleClick}
+        >
+          <img src={currentGif} alt="Dodo Bird" />
+          {talking && (
+            <div className="speech-bubble">
+              <p>{typedMessage}</p>
+              <button
+                className={classNames('open-new-tab-button', { show: isComplete })}
+                onClick={() => {
+                  window.open(url, '_blank')
+                }}
+              >
+                Play!
+              </button>
+            </div>
+          )}
+        </div>
+      </Draggable>
+      {trash.map((item) => (
+        <div
+          key={item.id}
+          className="trash-piece"
+          style={{ position: 'absolute', left: item.x, top: item.y }}
+          onClick={() => handleTrashClick(item.id)}
+        >
+          <img src={item.src} alt="Trash" />
+        </div>
+      ))}
+    </div>
   )
 }
 

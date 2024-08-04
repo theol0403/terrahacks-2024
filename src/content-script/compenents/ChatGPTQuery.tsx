@@ -96,14 +96,20 @@ function ChatGPTQuery(props: Props) {
     try {
       const prompt = JSON.parse(answer.text)
       console.log('answer', prompt)
-      const { contain_endangered, endangered_species, fun_fact } = prompt as {
+      const { contain_endangered, endangered_species, fun_fact, garbage } = prompt as {
         contain_endangered: boolean
         endangered_species: string
         fun_fact: string
+        garbage: boolean
       }
       if (contain_endangered && fun_fact) {
         return (
-          <DodoBird animal="Dodo Bird" message={fun_fact} url="https://www.openai.com/"></DodoBird>
+          <DodoBird
+            animal="Dodo Bird"
+            message={fun_fact}
+            url="https://www.openai.com/"
+            garbage={garbage}
+          ></DodoBird>
         )
       }
     } catch (e) {
