@@ -25,9 +25,14 @@ function DodoBird(props: Props) {
     'https://cdn.discordapp.com/attachments/1256733655724724224/1269447662386544690/ezgif.com-animated-gif-maker.gif?ex=66b018c3&is=66aec743&hm=f239890ed228235a6eac5779efd6bc94861cfd5b67ca4baa9e5436f67c2b5faa&'
   const flyingGif =
     'https://cdn.discordapp.com/attachments/1256733655724724224/1269449640793870446/ezgif.com-animated-gif-maker_2.gif?ex=66b01a9b&is=66aec91b&hm=200219b3793819ac3bf012db106b14b14990bb7b3ac51e044a76df6df52fcbfd&'
+  const talkFlyingGif =
+    'https://cdn.discordapp.com/attachments/1256733655724724224/1269449233900241129/ezgif.com-animated-gif-maker_1.gif?ex=66b01a3a&is=66aec8ba&hm=ccf20c97f1ec32e1207bf54b15981e2191a876217904d7670463de6454c12ab7&'
+
   // Determine which GIF to display
   let currentGif = defaultGif
-  if (talking) {
+  if (talking && (flying || isDragging)) {
+    currentGif = talkFlyingGif
+  } else if (talking) {
     currentGif = talkingGif
   } else if (flying || isDragging) {
     currentGif = flyingGif
