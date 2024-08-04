@@ -3,8 +3,6 @@ import '@/content-script/styles.scss'
 import classNames from 'classnames'
 import { memo, useEffect, useRef, useState } from 'react'
 import Draggable from 'react-draggable'
-import ReactMarkdown from 'react-markdown'
-import rehypeHighlight from 'rehype-highlight'
 import useTypingEffect from './TypingAnimation'
 
 interface Props {
@@ -20,14 +18,14 @@ function DodoBird(props: Props) {
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const dodoRef = useRef<HTMLDivElement | null>(null)
-  const typedMessage = useTypingEffect(message, 50, talking) // Use the custom hook with a speed of 200ms
+  const typedMessage = useTypingEffect(message, 30, talking) // Use the custom hook with a speed of 200ms
 
   useEffect(() => {
     const updatePosition = () => {
       const windowWidth = window.innerWidth
       const windowHeight = window.innerHeight
       const dodoWidth = dodoRef.current?.offsetWidth || 100
-      const dodoHeight = dodoRef.current?.offsetHeight || 100
+      const dodoHeight = dodoRef.current?.offsetHeight || 140
       setPosition({
         x: windowWidth - dodoWidth,
         y: windowHeight - dodoHeight,
@@ -99,9 +97,7 @@ function DodoBird(props: Props) {
         <img src={logo} alt="Dodo Bird" />
         {talking && (
           <div className="speech-bubble">
-            <ReactMarkdown rehypePlugins={[[rehypeHighlight, { detect: true }]]}>
-              {typedMessage}
-            </ReactMarkdown>
+            <p>{typedMessage}</p>
           </div>
         )}
       </div>

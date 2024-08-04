@@ -34,9 +34,7 @@ function ChatGPTQuery(props: Props) {
       const port = Browser.runtime.connect()
       const listener = (msg: any) => {
         if (msg.text) {
-          let text = msg.text || ''
-          text = text.replace(/^(\s|:\n\n)+|(:)+|(:\s)$/g, '')
-
+          const text = msg.text || ''
           setAnswer({ ...msg, ...{ text } })
           setStatus('success')
         } else if (msg.error) {
@@ -95,10 +93,23 @@ function ChatGPTQuery(props: Props) {
     }
   }, [answer])
 
-  if (answer) {
-    return (
-      <DodoBird animal="Dodo Bird" message={answer.text} url="https://www.openai.com/"></DodoBird>
-    )
+  if (answer?.text) {
+    try {
+      const prompt = JSON.parse(answer.text)
+      console.log('answer', prompt)
+      const { contain_endangered, endangered_species, fun_fact } = prompt as {
+        contain_endangered: boolean
+        endangered_species: string
+        fun_fact: string
+      }
+      if (contain_endangered) {
+        return (
+          <DodoBird animal="Dodo Bird" message={fun_fact} url="https://www.openai.com/"></DodoBird>
+        )
+      }
+    } catch (e) {
+      // console.error('Failed to parse JSON', e)
+    }
   }
 
   if (error === 'UNAUTHORIZED' || error === 'CLOUDFLARE') {
