@@ -17,7 +17,7 @@ const userConfigWithDefaultValue: {
   promptComment: '',
   enableSites: null,
   pageSummaryWhitelist: '',
-  pageSummaryBlacklist: '',
+  pageSummaryBlacklist: '127.0.0.1',
   continueConversation: true,
 }
 

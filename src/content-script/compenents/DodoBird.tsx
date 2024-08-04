@@ -1,5 +1,5 @@
 import beans from '@/assets/img/beans.png'
-import chips from '@/assets/img/chips.png'
+// import chips from '@/assets/img/chips.png'
 import standing from '@/assets/img/logo.png'
 import water from '@/assets/img/water.png'
 import '@/content-script/styles.scss'
@@ -136,7 +136,7 @@ function DodoBird(props: Props) {
     if (trash.length < 3) {
       const windowWidth = window.innerWidth
       const windowHeight = window.innerHeight
-      const trashImages = [beans, chips, water]
+      const trashImages = [beans, water]
       const trashPiece = {
         id: Date.now(),
         x: Math.random() * windowWidth,

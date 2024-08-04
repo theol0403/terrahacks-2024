@@ -112,7 +112,7 @@ function ChatGPTQuery(props: Props) {
         short_description: string
       }
 
-      const url = `localhost:5000/?animal=${encodeURIComponent(
+      const url = `http://127.0.0.1:5000/?animal=${encodeURIComponent(
         endangered_species,
       )}&environment=${encodeURIComponent(
         environment.toUpperCase(),
