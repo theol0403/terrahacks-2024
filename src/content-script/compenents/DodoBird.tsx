@@ -76,21 +76,22 @@ function DodoBird(props: Props) {
 
   const handleStop = (e, data) => {
     setIsDragging(false)
-    setFlying(true)
-    const windowHeight = window.innerHeight
-    const dodoHeight = dodoRef.current?.offsetHeight || 100
-
-    const endY = windowHeight - dodoHeight
-
-    setPosition({ x: data.x, y: endY })
-
-    setTimeout(() => {
-      setFlying(false)
-    }, 1500)
+    flyToBottom(data.x)
   }
 
   const handleStart = () => {
     setIsDragging(true)
+  }
+
+  const flyToBottom = (x: number) => {
+    const windowHeight = window.innerHeight
+    const dodoHeight = dodoRef.current?.offsetHeight || 100
+    const endY = windowHeight - dodoHeight
+    setFlying(true)
+    setPosition({ x, y: endY })
+    setTimeout(() => {
+      setFlying(false)
+    }, 1500)
   }
 
   useEffect(() => {
@@ -115,20 +116,35 @@ function DodoBird(props: Props) {
   }
 
   const handleTrashClick = (id: number) => {
-    setTrash((prevTrash) => prevTrash.filter((item) => item.id !== id))
+    const trashItem = trash.find((item) => item.id === id)
+    if (trashItem) {
+      setPosition({ x: trashItem.x - 10, y: trashItem.y - 60 })
+      setFlying(true)
+      setTalking(false)
+      setTimeout(() => {
+        setPickingUpTrash(true)
+        setTimeout(() => {
+          setTrash((prevTrash) => prevTrash.filter((item) => item.id !== id))
+          setPickingUpTrash(false)
+          flyToBottom(trashItem.x - 10)
+        }, 500)
+      }, 1500)
+    }
   }
 
   const spawnTrash = () => {
-    const windowWidth = window.innerWidth
-    const windowHeight = window.innerHeight
-    const trashImages = [beans, chips, water]
-    const trashPiece = {
-      id: Date.now(),
-      x: Math.random() * windowWidth,
-      y: Math.random() * windowHeight,
-      src: trashImages[Math.floor(Math.random() * trashImages.length)],
+    if (trash.length < 3) {
+      const windowWidth = window.innerWidth
+      const windowHeight = window.innerHeight
+      const trashImages = [beans, chips, water]
+      const trashPiece = {
+        id: Date.now(),
+        x: Math.random() * windowWidth,
+        y: Math.random() * windowHeight,
+        src: trashImages[Math.floor(Math.random() * trashImages.length)],
+      }
+      setTrash((prevTrash) => [...prevTrash, trashPiece])
     }
-    setTrash((prevTrash) => [...prevTrash, trashPiece])
   }
 
   useEffect(() => {
@@ -137,23 +153,6 @@ function DodoBird(props: Props) {
       return () => clearInterval(intervalId)
     }
   }, [garbage])
-
-  useEffect(() => {
-    if (trash.length > 0) {
-      const { x, y } = trash[0]
-      setPosition({ x: x - 20, y: y - 60 })
-      setFlying(true)
-      setTalking(false)
-      setTimeout(() => {
-        setPickingUpTrash(true)
-        setTimeout(() => {
-          handleTrashClick(trash[0].id)
-          setPickingUpTrash(false)
-          setFlying(false)
-        }, 500)
-      }, 1500)
-    }
-  }, [trash])
 
   return (
     <div>
