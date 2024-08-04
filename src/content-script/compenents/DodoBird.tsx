@@ -33,7 +33,7 @@ function DodoBird(props: Props) {
   const talkFlyingGif =
     'https://cdn.discordapp.com/attachments/1256733655724724224/1269449233900241129/ezgif.com-animated-gif-maker_1.gif?ex=66b01a3a&is=66aec8ba&hm=ccf20c97f1ec32e1207bf54b15981e2191a876217904d7670463de6454c12ab7&'
   const trashGif =
-    'https://cdn.discordapp.com/attachments/1256733655724724224/1269527343907475487/Garbage_Pickup_DODO.png?ex=66b062f9&is=66af1179&hm=a4abc81b4d7efc67ed7aba3e32b7ef1581fbd4154b34fa72cc15b58454b88fe4&'
+    'https://cdn.discordapp.com/attachments/1256733655724724224/1269538505030238281/Garbage_Pickup_DODO.png?ex=66b06d5e&is=66af1bde&hm=30183c405fdac9cd3d6dd77da06fbb72452f99d372c0e428844a785ee5a7800d&'
 
   let currentGif = defaultGif
   if (pickingUpTrash) {
@@ -118,7 +118,7 @@ function DodoBird(props: Props) {
   const handleTrashClick = (id: number) => {
     const trashItem = trash.find((item) => item.id === id)
     if (trashItem) {
-      setPosition({ x: trashItem.x - 10, y: trashItem.y - 60 })
+      setPosition({ x: trashItem.x - 10, y: trashItem.y - 40 })
       setFlying(true)
       setTalking(false)
       setTimeout(() => {

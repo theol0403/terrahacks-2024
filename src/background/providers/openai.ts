@@ -6,19 +6,11 @@ export class OpenAIProvider implements Provider {
   token = SECRET_KEY
   model = DEFAULT_MODEL
 
-  private buildPrompt(prompt: string): string {
-    if (this.model.startsWith('text-chat-davinci')) {
-      return `Respond conversationally.<|im_end|>\n\nUser: ${prompt}<|im_sep|>\nChatGPT:`
-    }
-    return prompt
-  }
-
   private buildMessages(prompt: string) {
     return [{ role: 'user', content: prompt }]
   }
 
   async generateAnswer(params: GenerateAnswerParams) {
-    const gptModel = DEFAULT_MODEL
     const apiHost = DEFAULT_API_HOST
     const apiPath = undefined
 
@@ -31,13 +23,8 @@ export class OpenAIProvider implements Provider {
       max_tokens: 800,
       // temperature: 0.5,
     }
-    if (gptModel === 'text-davinci-003') {
-      url = `https://${apiHost}${apiPath || '/v1/completions'}`
-      reqParams = { ...reqParams, ...{ prompt: this.buildPrompt(params.prompt) } }
-    } else {
-      url = `https://${apiHost}${apiPath || '/v1/chat/completions'}`
-      reqParams = { ...reqParams, ...{ messages: this.buildMessages(params.prompt) } }
-    }
+    url = `https://${apiHost}${apiPath || '/v1/chat/completions'}`
+    reqParams = { ...reqParams, ...{ messages: this.buildMessages(params.prompt) } }
 
     let result = ''
     await fetchSSE(url, {
@@ -58,7 +45,7 @@ export class OpenAIProvider implements Provider {
         try {
           data = JSON.parse(message)
           const text =
-            gptModel === 'text-davinci-003' ? data.choices[0].text : data.choices[0].delta.content
+            data.choices[0].delta.content
 
           if (text === undefined || text === '<|im_end|>' || text === '<|im_sep|>') {
             return
