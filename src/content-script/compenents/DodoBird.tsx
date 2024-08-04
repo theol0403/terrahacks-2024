@@ -143,13 +143,19 @@ function DodoBird(props: Props) {
         y: Math.random() * windowHeight,
         src: trashImages[Math.floor(Math.random() * trashImages.length)],
       }
-      setTrash((prevTrash) => [...prevTrash, trashPiece])
+      setTrash((prevTrash) => {
+        if (prevTrash.length < 3) {
+          return [...prevTrash, trashPiece]
+        }
+        return prevTrash
+      })
     }
   }
 
   useEffect(() => {
     if (garbage) {
-      const intervalId = setInterval(spawnTrash, 6000)
+      const intervalId = setInterval(spawnTrash, 10000)
+      spawnTrash()
       return () => clearInterval(intervalId)
     }
   }, [garbage])
