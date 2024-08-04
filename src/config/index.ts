@@ -28,7 +28,7 @@ export async function getUserConfig(): Promise<UserConfig> {
   return defaults(result, userConfigWithDefaultValue)
 }
 
-export const APP_TITLE = `Dodo Bot`
+export const APP_TITLE = `Didi the Dodo`
 
 export const DEFAULT_MODEL = 'gpt-4o-mini'
 export const DEFAULT_API_HOST = 'api.openai.com'

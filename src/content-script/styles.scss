@@ -59,9 +59,8 @@
 }
 
 .open-new-tab-button {
-  background-color: #4CAF50; /* Green */
-  border: black;
-  border-width: 1px;
+  background-color: #4CAF50;
+  border: 1.5px solid black;
   color: white;
   padding: 10px 30px;
   text-align: center;
@@ -75,10 +74,18 @@
   opacity: 0;
 }
 
+
 .open-new-tab-button.show {
   opacity: 1;
 }
 
 .open-new-tab-button:hover {
   background-color: #45a049;
+}
+
+p {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
 }
